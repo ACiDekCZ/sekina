@@ -56,6 +56,7 @@ const dom = {
   howBtn: document.getElementById('how'),
   backBtn: document.getElementById('back'),
   retry: document.getElementById('retry'),
+  menuBtn: document.getElementById('menu-btn'),
   nextLevel: document.getElementById('next-level'),
   seedInput: document.getElementById('seed'),
   levels: document.getElementById('levels'),
@@ -1027,6 +1028,14 @@ dom.play?.addEventListener('click', () => {
 });
 
 dom.retry?.addEventListener('click', () => startGame());
+
+dom.menuBtn?.addEventListener('click', () => {
+  // go back to main menu from game over
+  state.running = false;
+  dom.gameover.classList.remove('visible');
+  dom.menu.classList.add('visible');
+  refreshLevelSelect();
+});
 
 dom.nextLevel?.addEventListener('click', () => {
   dom.leveldone.classList.remove('visible');

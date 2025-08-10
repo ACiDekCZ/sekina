@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0d0d0f" />
+  <title>Sekina Dash – Jack Russell Run</title>
+  <meta name="description" content="Fast, responsive, immersive one-button runner inspired by Geometry Dash – play as a Jack Russell terrier!" />
+  <link rel="preload" href="assets/jack.svg" as="image" type="image/svg+xml" />
+  <link rel="preload" href="assets/obstacle.svg" as="image" type="image/svg+xml" />
+  <link rel="preload" href="assets/coin.svg" as="image" type="image/svg+xml" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="hud">
+      <div class="brand">🐾 Sekina Dash</div>
+      <div class="stats">
+        <span id="score">0</span>
+        <span id="best" title="Best score">0</span>
+      </div>
+      <button id="mute" class="icon-btn" aria-label="Sound on/off" title="Sound">🔊</button>
+    </header>
+
+    <main id="game-root" role="application" aria-label="Sekina Dash – game">
+      <canvas id="game" width="800" height="450"></canvas>
+
+      <div id="tap-hint" class="hint">Tap / click to jump</div>
+
+      <div id="menu" class="overlay visible">
+        <h1>🐶 Sekina Run</h1>
+        <p>Tap / click to jump. Hold for a higher jump.</p>
+        <div class="controls">
+          <button id="play" class="primary">Play</button>
+          <button id="how">How to Play</button>
+        </div>
+        <div class="controls" id="seed-row" style="margin-top:12px; gap:8px;">
+          <label for="seed" style="color:#a9b2c2;">Seed:</label>
+          <input id="seed" placeholder="e.g. 42 or delta" style="padding:8px 10px;border-radius:10px;border:1px solid #ffffff22;background:#0f1320;color:#eef2f7;">
+        </div>
+        <div class="controls" id="level-row" style="margin-top:8px; gap:8px;">
+          <label for="level" style="color:#a9b2c2;">Level:</label>
+          <input id="level" type="number" min="1" max="10" value="1" style="padding:8px 10px;border-radius:10px;border:1px solid #ffffff22;background:#0f1320;color:#eef2f7;">
+        </div>
+
+        <div id="levels" class="levels" aria-label="Level select"></div>
+      </div>
+
+      <div id="howto" class="overlay">
+        <h2>How to Play</h2>
+        <ul>
+          <li>Dodge obstacles, collect bones (coins).</li>
+          <li>Short tap = low jump, hold longer = higher jump.</li>
+          <li>The game speeds up – keep your focus and rhythm!</li>
+        </ul>
+        <button id="back" class="secondary">Back</button>
+      </div>
+
+      <div id="gameover" class="overlay">
+        <h2>Game Over</h2>
+        <p>Score: <strong id="final-score">0</strong></p>
+        <p>Best: <strong id="final-best">0</strong></p>
+        <div class="controls">
+          <button id="retry" class="primary">Retry</button>
+          <button id="share" class="secondary">Share</button>
+        </div>
+      </div>
+
+      <div id="leveldone" class="overlay">
+        <h2>Level complete!</h2>
+        <p>Great! Ready for the next challenge?</p>
+        <div class="controls">
+          <button id="next-level" class="primary">Next level</button>
+        </div>
+      </div>
+    </main>
+
+    <footer class="foot">© 2025 Sekina – fast web game</footer>
+  </div>
+
+  <script type="module" src="game.js"></script>
+</body>
+</html>

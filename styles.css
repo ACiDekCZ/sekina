@@ -1,0 +1,71 @@
+@layer reset, theme, layout, ui, game;
+
+@layer reset {
+  *, *::before, *::after { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Arial, sans-serif; background: #0d0d0f; color: #eef2f7; text-rendering: optimizeLegibility; }
+  button { font: inherit; cursor: pointer; }
+}
+
+@layer theme {
+  :root {
+    --bg: radial-gradient(1200px 600px at 70% 20%, #2a49ff22, #ff3cc033 35%, #0d0d0f 70%);
+    --panel: #13151aee;
+    --ink: #eef2f7;
+    --muted: #a9b2c2;
+    --accent: #ff3cc0;
+    --accent-2: #2a49ff;
+    --good: #4ade80;
+    --bad: #f87171;
+    --shadow: 0 20px 40px rgba(0,0,0,.45);
+  }
+}
+
+@layer layout {
+  #app { min-height: 100%; display: grid; grid-template-rows: auto 1fr auto; background: var(--bg) fixed; }
+  .hud { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: clamp(10px, 2.5vmin, 20px); backdrop-filter: blur(10px); background: linear-gradient( to bottom, #0d0d0fcc, #0d0d0f99 ); position: sticky; top: 0; z-index: 10; }
+  .brand { font-weight: 800; letter-spacing: .3px; text-transform: uppercase; color: #fff; }
+  .stats { display: inline-flex; gap: 14px; align-items: center; color: var(--muted); }
+  .icon-btn { background: transparent; border: 1px solid #ffffff22; color: #fff; border-radius: 10px; padding: 8px 10px; box-shadow: var(--shadow); }
+  .icon-btn:active { transform: translateY(1px); }
+  #game-root { position: relative; display: grid; place-items: center; padding: 12px; }
+  canvas#game { width: min(100vw, 1100px); height: calc(min(100vw, 1100px) * 9 / 16); max-height: min(70vh, 720px); background: linear-gradient( to top, #0e1016, #12172a ); border-radius: 16px; box-shadow: var(--shadow); touch-action: none; }
+  .hint { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); color: #ffffffcc; background: #00000055; border: 1px solid #ffffff1c; padding: 8px 12px; border-radius: 999px; opacity: 0; transition: opacity .5s ease; pointer-events: none; }
+  .hint.show { opacity: 1; }
+  .overlay { position: absolute; inset: 0; display: grid; place-items: center; gap: 16px; padding: 20px; background: linear-gradient(180deg, #0b0c10e6, #0b0c1088); border-radius: 16px; opacity: 0; pointer-events: none; transition: opacity .25s ease; text-align: center; }
+  .overlay.visible { opacity: 1; pointer-events: auto; }
+  .overlay h1, .overlay h2 { margin: 0 0 4px; }
+  .controls { display: inline-flex; gap: 12px; }
+  .levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 12px; width: min(90vw, 520px); }
+  .level-btn { display: grid; place-items: center; padding: 10px; border-radius: 12px; background: #1a1f2b; color: #fff; border: 1px solid #ffffff20; box-shadow: var(--shadow); min-height: 48px; }
+  .level-btn .title { font-weight: 700; font-size: 12px; letter-spacing: .2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 92%; }
+  .level-btn .meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .level-btn.locked { opacity: 0.5; filter: grayscale(0.5); }
+  .level-btn.locked:after { content: '🔒'; margin-left: 6px; }
+  .primary, .secondary { border: none; padding: 10px 18px; border-radius: 12px; box-shadow: var(--shadow); }
+  .primary { background: linear-gradient(135deg, var(--accent), #ff7ad6); color: #0b0710; font-weight: 800; }
+  .secondary { background: #1a1f2b; color: #fff; border: 1px solid #ffffff20; }
+  .foot { text-align: center; color: var(--muted); padding: 10px 14px; }
+}
+
+@layer ui {
+  @keyframes floaty {
+    from { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+    to { transform: translateY(0); }
+  }
+  #menu.visible h1 { animation: floaty 3s ease-in-out infinite; }
+}
+
+@layer game {
+  .shake { animation: shake .5s linear; }
+  @keyframes shake {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, 0, 0); }
+    30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+    40%, 60% { transform: translate3d(4px, 0, 0); }
+  }
+}
+
+/* Utility */
+.hidden { display: none !important; }

@@ -21,7 +21,7 @@ const DEBUG = false;
 
 // Preset seeds for 10 levels (tweak as needed)
 const PRESET_LEVEL_SEEDS = [
-  'L1-default',
+  '2',
   'L2-topspikes-start',
   'L3-tighter-platforms',
   'L4-faster-saws',

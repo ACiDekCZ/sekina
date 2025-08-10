@@ -328,9 +328,18 @@ function init() {
 
 function createInputs(target) {
   const pressed = { jump: false, justPressed: false };
-  const start = (e) => { e.preventDefault(); if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; hint(false); };
+  const start = (e) => {
+    // allow tap anywhere to jump, but only during active gameplay
+    const gameActive = state.running && !dom.menu.classList.contains('visible') && !dom.gameover.classList.contains('visible') && !dom.leveldone.classList.contains('visible');
+    if (!gameActive) return;
+    e.preventDefault();
+    if (!pressed.jump) pressed.justPressed = true;
+    pressed.jump = true;
+    hint(false);
+  };
   const end = (e) => { e.preventDefault(); pressed.jump = false; };
-  target.addEventListener('pointerdown', start);
+  // listen on window so taps anywhere trigger jump on mobile
+  window.addEventListener('pointerdown', start, { passive: false });
   window.addEventListener('pointerup', end);
   window.addEventListener('keydown', (e) => { if ((e.code === 'Space' || e.code === 'ArrowUp') && !e.repeat) { if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; hint(false);} });
   window.addEventListener('keydown', (e) => { if (e.code === 'KeyH') state.debugHitbox = !state.debugHitbox; });
@@ -365,6 +374,10 @@ function createWorld() {
     spawnCursorX: 0,
     nextSectionIndex: 0,
     plannedSections: [],
+    sections: [], // spawned section boundaries { index, startX, endX }
+    stopSpawning: false,
+    timeUp: false,
+    finalSectionEndX: null,
     levelTimeLeft: LEVEL_DURATION_SEC,
     levelElapsed: 0
   };
@@ -442,6 +455,10 @@ function startLevel(levelNumber) {
   state.level = chosenLevel;
   world.plannedSections = buildPlanForLevel(chosenLevel);
   world.nextSectionIndex = 0;
+  world.sections = [];
+  world.stopSpawning = false;
+  world.timeUp = false;
+  world.finalSectionEndX = null;
   world.spawnCursorX = viewport.width + 200; // start ahead of player
   // refresh level select UI (HS, lock states)
   refreshLevelSelect();
@@ -625,7 +642,10 @@ function spawnNext() {
   const index = world.nextSectionIndex;
   const list = world.plannedSections;
   const sec = list[index % list.length] || createSectionFor(state.level || 1, 0.9);
+  const base = world.spawnCursorX;
   spawnSection(sec);
+  // record section boundaries in world space
+  world.sections.push({ index, startX: base, endX: base + sec.length });
   world.nextSectionIndex += 1;
 }
 
@@ -691,13 +711,38 @@ function update(dt) {
   }
 
   // spawn next sections ahead so there is always something to run
-  while ((getLastSpawnX() - world.distance) < (viewport.width + 1200)) {
-    spawnNext();
+  if (!world.stopSpawning) {
+    while ((getLastSpawnX() - world.distance) < (viewport.width + 1200)) {
+      spawnNext();
+    }
   }
 
-  // level end: when time elapsed and few sections remain in plan
-  if (world.levelTimeLeft <= 0 && world.nextSectionIndex >= world.plannedSections.length - 2) {
-    completeLevel();
+  // Time limit handling: once time is up, finish the current section
+  if (!world.timeUp && world.levelTimeLeft <= 0) {
+    world.timeUp = true;
+    world.stopSpawning = true;
+    // determine current section under the player
+    const playerWorldX = world.distance + world.player.x;
+    let current = null;
+    for (let i = 0; i < world.sections.length; i++) {
+      const s = world.sections[i];
+      if (playerWorldX >= s.startX && playerWorldX < s.endX) { current = s; break; }
+    }
+    // fallback: if not found (e.g., early), take the last spawned section
+    const selected = current || world.sections[world.sections.length - 1];
+    if (selected) {
+      world.finalSectionEndX = selected.endX;
+    } else {
+      // if nothing spawned yet, complete immediately
+      world.finalSectionEndX = world.distance + 1;
+    }
+  }
+  if (world.timeUp && world.finalSectionEndX != null) {
+    const playerWorldX = world.distance + world.player.x;
+    if (playerWorldX >= world.finalSectionEndX) {
+      completeLevel();
+      return;
+    }
   }
 
   // move and recycle
@@ -1024,6 +1069,7 @@ dom.play?.addEventListener('click', () => {
   state.running = true;
   dom.menu.classList.remove('visible');
   dom.gameover.classList.remove('visible');
+  document.getElementById('app')?.classList.add('playing');
   hint(true);
 });
 
@@ -1035,6 +1081,7 @@ dom.menuBtn?.addEventListener('click', () => {
   dom.gameover.classList.remove('visible');
   dom.menu.classList.add('visible');
   refreshLevelSelect();
+  document.getElementById('app')?.classList.remove('playing');
 });
 
 dom.nextLevel?.addEventListener('click', () => {
@@ -1044,6 +1091,7 @@ dom.nextLevel?.addEventListener('click', () => {
   state.level = next;
   startLevel(state.level);
   state.running = true;
+  document.getElementById('app')?.classList.add('playing');
 });
 
 dom.menuBtnLevelComplete?.addEventListener('click', () => {
@@ -1052,17 +1100,12 @@ dom.menuBtnLevelComplete?.addEventListener('click', () => {
   dom.leveldone.classList.remove('visible');
   dom.menu.classList.add('visible');
   refreshLevelSelect();
+  document.getElementById('app')?.classList.remove('playing');
 });
 
 // How-to overlay removed from UI
 
-dom.share?.addEventListener('click', async () => {
-  const text = `I played Sekina Dash! Score ${state.score}, best ${state.best}.`;
-  try {
-    if (navigator.share) await navigator.share({ text });
-    else await navigator.clipboard.writeText(text);
-  } catch {}
-});
+// Share button removed from UI
 
 dom.mute?.addEventListener('click', () => {
   state.audioOn = !state.audioOn;

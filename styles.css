@@ -29,10 +29,10 @@
   .icon-btn { background: transparent; border: 1px solid #ffffff22; color: #fff; border-radius: 10px; padding: 8px 10px; box-shadow: var(--shadow); }
   .icon-btn:active { transform: translateY(1px); }
   #game-root { position: relative; display: grid; place-items: center; padding: 12px; }
-  canvas#game { width: min(100vw, 1100px); height: calc(min(100vw, 1100px) * 9 / 16); max-height: min(70vh, 720px); background: linear-gradient( to top, #0e1016, #12172a ); border-radius: 16px; box-shadow: var(--shadow); touch-action: none; }
+  canvas#game { width: min(100vw, 1100px); height: calc(min(100vw, 1100px) * 9 / 16); max-height: min(70vh, 720px); background: linear-gradient( to top, #0e1016, #12172a ); border-radius: 16px; box-shadow: var(--shadow); touch-action: none; position: relative; z-index: 1; }
   .hint { position: absolute; bottom: 18%; left: 50%; transform: translateX(-50%); color: #ffffffcc; background: #00000055; border: 1px solid #ffffff1c; padding: 8px 12px; border-radius: 999px; opacity: 0; transition: opacity .5s ease; pointer-events: none; }
   .hint.show { opacity: 1; }
-  .overlay { position: absolute; inset: 0; display: grid; place-items: center; gap: 16px; padding: 20px; background: linear-gradient(180deg, #0b0c10e6, #0b0c1088); border-radius: 16px; opacity: 0; pointer-events: none; transition: opacity .25s ease; text-align: center; }
+  .overlay { position: absolute; inset: 0; display: grid; place-items: center; gap: 16px; padding: 20px; background: linear-gradient(180deg, #0b0c10e6, #0b0c1088); border-radius: 16px; opacity: 0; pointer-events: none; transition: opacity .25s ease; text-align: center; z-index: 3; }
   .overlay.visible { opacity: 1; pointer-events: auto; }
   .overlay h1, .overlay h2 { margin: 0 0 4px; }
   .controls { display: inline-flex; gap: 12px; }
@@ -69,3 +69,6 @@
 
 /* Utility */
 .hidden { display: none !important; }
+
+/* During gameplay ensure HUD does not cover the game on mobile */
+.playing .hud { z-index: 0; }

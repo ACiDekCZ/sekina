@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <defs>
+    <radialGradient id="metal" cx="0.5" cy="0.5" r="0.7">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cbd5e1"/>
+    </radialGradient>
+  </defs>
+  <g stroke="#0a0f2a" stroke-width="2">
+    <circle cx="32" cy="32" r="28" fill="url(#metal)"/>
+    <g fill="#94a3b8">
+      <path d="M32 4 l6 10 h-12 z"/>
+      <path d="M60 32 l-10 6 v-12 z"/>
+      <path d="M32 60 l-6 -10 h12 z"/>
+      <path d="M4 32 l10 -6 v12 z"/>
+    </g>
+    <circle cx="32" cy="32" r="5" fill="#0a0f2a"/>
+  </g>
+</svg>

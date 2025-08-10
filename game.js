@@ -84,9 +84,22 @@ const LEVELS = [
   { id: 10, title: 'Marathn' }
 ];
 
+function getHighs() {
+  try { return JSON.parse(localStorage.getItem('sekina_highs') || '{}'); } catch { return {}; }
+}
+
+function getHighFor(levelId) {
+  const raw = getHighs()[levelId];
+  if (raw == null) return { score: 0, furthest: 0 };
+  if (typeof raw === 'number') return { score: raw, furthest: 0 };
+  const score = Number(raw.score || 0);
+  const furthest = Math.max(0, Math.min(1, Number(raw.furthest || 0)));
+  return { score, furthest };
+}
+
 function getProgress() {
   const unlocked = Number(localStorage.getItem('sekina_unlocked') || '1');
-  const highs = JSON.parse(localStorage.getItem('sekina_highs') || '{}');
+  const highs = getHighs();
   return { unlocked: Math.max(1, Math.min(LEVELS.length, unlocked)), highs };
 }
 
@@ -96,11 +109,32 @@ function setUnlocked(levelId) {
   localStorage.setItem('sekina_unlocked', String(Math.max(next, 1)));
 }
 
-function setHighscore(levelId, score) {
+function setHighscore(levelId, score, furthestRatio) {
   const key = 'sekina_highs';
-  const highs = JSON.parse(localStorage.getItem(key) || '{}');
-  highs[levelId] = Math.max(Number(highs[levelId] || 0), Number(score || 0));
+  const highs = getHighs();
+  const prev = getHighFor(levelId);
+  const next = {
+    score: Math.max(prev.score, Number(score || 0)),
+    furthest: Math.max(prev.furthest, Math.max(0, Math.min(1, Number(furthestRatio || 0))))
+  };
+  highs[levelId] = next;
   localStorage.setItem(key, JSON.stringify(highs));
+}
+
+// Furthest progress (0..1) per-level for subtle progress indicator
+function getFurthestMap() {
+  try { return JSON.parse(localStorage.getItem('sekina_furthest') || '{}'); } catch { return {}; }
+}
+function getFurthestRatio(levelId) {
+  const map = getFurthestMap();
+  const v = Number(map[levelId] || 0);
+  return isFinite(v) ? Math.max(0, Math.min(1, v)) : 0;
+}
+function setFurthestRatio(levelId, ratio01) {
+  const r = Math.max(0, Math.min(1, Number(ratio01) || 0));
+  const map = getFurthestMap();
+  map[levelId] = Math.max(Number(map[levelId] || 0), r);
+  localStorage.setItem('sekina_furthest', JSON.stringify(map));
 }
 
 function buildLevelSelect() {
@@ -113,8 +147,14 @@ function buildLevelSelect() {
     btn.className = 'level-btn' + (lv.id > unlocked && !DEBUG ? ' locked' : '');
     btn.disabled = (lv.id > unlocked && !DEBUG);
     btn.title = `Level ${lv.id}`;
-    const high = highs[lv.id] || 0;
-    btn.innerHTML = `<div class="title">L${lv.id} · ${lv.title}</div><div class="meta">HS ${high}</div>`;
+    const hf = (typeof highs[lv.id] === 'number') ? { score: highs[lv.id], furthest: 0 } : (highs[lv.id] || { score: 0, furthest: 0 });
+    const furPercent = Math.round(100 * Math.max(0, Math.min(1, Number(hf.furthest || 0))));
+    const scoreVal = Number(hf.score || 0);
+    btn.innerHTML = `
+      <div class="title">L${lv.id} · ${lv.title}</div>
+      <div class="meta">HS ${scoreVal}</div>
+      <div class="lvl-progress" aria-hidden="true"><div class="lvl-progress__fill" style="width:${furPercent}%"></div></div>
+    `;
     btn.addEventListener('click', () => {
       // v debug lze skákat kamkoliv, jinak pouze odemčené
       const target = lv.id;
@@ -152,6 +192,11 @@ function estimateLevelDistancePx() {
   const s1 = CONFIG.speed + CONFIG.speedGain * LEVEL_DURATION_SEC;
   const avg = (s0 + s1) / 2;
   return Math.floor(avg * LEVEL_DURATION_SEC);
+}
+
+function estimateLevelDistanceWithPlanPx(level) {
+  // approximate target used for plan building
+  return estimateLevelDistancePx() + 400;
 }
 
 function buildPlanForLevel(level) {
@@ -378,6 +423,7 @@ function createWorld() {
     stopSpawning: false,
     timeUp: false,
     finalSectionEndX: null,
+    finishX: null,
     levelTimeLeft: LEVEL_DURATION_SEC,
     levelElapsed: 0
   };
@@ -408,6 +454,10 @@ function endGame() {
   dom.finalScore.textContent = state.score.toString();
   // highscore per-level
   setHighscore(state.level || 1, state.score);
+  // save furthest reached distance ratio even on fail
+  const totalEnd = estimateLevelDistanceWithPlanPx(state.level || 1);
+  const ratioEnd = totalEnd > 0 ? Math.max(0, Math.min(1, (world.distance + (world.player?.x || 0)) / totalEnd)) : 0;
+  setFurthestRatio(state.level || 1, ratioEnd);
   state.best = Math.max(state.best, state.score);
   localStorage.setItem('sekina_best', String(state.best));
   dom.best.textContent = state.best.toString();
@@ -423,6 +473,8 @@ function startLevel(levelNumber) {
   world.speed = CONFIG.speed;
   world.distance = 0;
   state.levelScore = 0;
+  // start-of-level furthest marker (from previous attempts)
+  world.furthestRatioAtStart = getFurthestRatio(levelNumber);
   // Deterministic RNG for level
   // Priority: in DEBUG mode you can set seed and level from menu
   let chosenLevel = levelNumber;
@@ -459,14 +511,17 @@ function startLevel(levelNumber) {
   world.stopSpawning = false;
   world.timeUp = false;
   world.finalSectionEndX = null;
+  world.finishX = null;
   world.spawnCursorX = viewport.width + 200; // start ahead of player
   // refresh level select UI (HS, lock states)
   refreshLevelSelect();
 }
 
 function completeLevel() {
-  // save per-level HS and unlock the next level
-  setHighscore(state.level || 1, state.levelScore || 0);
+  // save per-level HS (score + furthest ratio) and unlock the next level
+  const totalOk = estimateLevelDistanceWithPlanPx(state.level || 1);
+  const ratioOk = totalOk > 0 ? Math.max(0, Math.min(1, (world.distance + (world.player?.x || 0)) / totalOk)) : 0;
+  setHighscore(state.level || 1, state.levelScore || 0, ratioOk);
   unlockNextLevel(state.level || 1);
   refreshLevelSelect();
 
@@ -732,9 +787,11 @@ function update(dt) {
     const selected = current || world.sections[world.sections.length - 1];
     if (selected) {
       world.finalSectionEndX = selected.endX;
+      world.finishX = selected.endX;
     } else {
       // if nothing spawned yet, complete immediately
       world.finalSectionEndX = world.distance + 1;
+      world.finishX = world.finalSectionEndX;
     }
   }
   if (world.timeUp && world.finalSectionEndX != null) {
@@ -882,6 +939,62 @@ function drawBackground(ctx) {
   // lane
   ctx.fillStyle = '#1b2544';
   ctx.fillRect(0, viewport.groundY - 4, viewport.width, 4);
+
+  // draw finish indicator when time is up: pulsing vertical ribbon at finishX
+  if (world.timeUp && world.finishX != null) {
+    const screenX = world.finishX - world.distance;
+    if (screenX > -40 && screenX < viewport.width + 40) {
+      const pulse = 0.5 + 0.5 * Math.sin(world.time * 6);
+      const grad = ctx.createLinearGradient(0, 0, 0, viewport.groundY);
+      grad.addColorStop(0, `hsla(290, 90%, ${60 + pulse * 20}%, 0.85)`);
+      grad.addColorStop(1, `hsla(260, 90%, ${45 + pulse * 15}%, 0.85)`);
+      ctx.save();
+      ctx.translate(Math.floor(screenX), 0);
+      ctx.fillStyle = grad;
+      const ribbonWidth = 10 + Math.floor(pulse * 6);
+      ctx.fillRect(-ribbonWidth / 2, 0, ribbonWidth, viewport.groundY);
+      // chequered flag effect near top
+      ctx.globalAlpha = 0.9;
+      ctx.fillStyle = '#ffffffcc';
+      const flagY = 20;
+      const flagW = 36;
+      const flagH = 18;
+      ctx.fillRect(-flagW / 2, flagY, flagW, flagH);
+      ctx.fillStyle = '#00000088';
+      for (let y = 0; y < 2; y++) {
+        for (let x = 0; x < 6; x++) {
+          if ((x + y) % 2 === 0) ctx.fillRect(-flagW / 2 + x * (flagW / 6), flagY + y * (flagH / 2), flagW / 6, flagH / 2);
+        }
+      }
+      ctx.restore();
+    }
+  }
+
+  // subtle level progress bar (bottom center), with personal furthest mark
+  const total = estimateLevelDistanceWithPlanPx(state.level || 1);
+  const progress = Math.max(0, Math.min(1, world.distance / total));
+  const saved = world.furthestRatioAtStart || 0;
+  const barWidth = Math.min(280, Math.floor(viewport.width * 0.5));
+  const barHeight = 6;
+  const x0 = Math.floor((viewport.width - barWidth) / 2);
+  const y0 = viewport.groundY + 12;
+  ctx.save();
+  ctx.globalAlpha = 0.85;
+  // background
+  ctx.fillStyle = '#0b0f1a';
+  ctx.fillRect(x0, y0, barWidth, barHeight);
+  // progress fill
+  const fillW = Math.floor(barWidth * progress);
+  const grad2 = ctx.createLinearGradient(x0, 0, x0 + fillW, 0);
+  grad2.addColorStop(0, '#6d28d9');
+  grad2.addColorStop(1, '#22d3ee');
+  ctx.fillStyle = grad2;
+  ctx.fillRect(x0, y0, fillW, barHeight);
+  // saved furthest marker
+  const mx = x0 + Math.floor(barWidth * saved);
+  ctx.fillStyle = '#ffffffbb';
+  ctx.fillRect(mx - 1, y0 - 2, 2, barHeight + 4);
+  ctx.restore();
 }
 
 function drawPlayer(ctx) {

@@ -40,6 +40,8 @@
   .level-btn { display: grid; place-items: center; padding: 10px; border-radius: 12px; background: #1a1f2b; color: #fff; border: 1px solid #ffffff20; box-shadow: var(--shadow); min-height: 48px; }
   .level-btn .title { font-weight: 700; font-size: 12px; letter-spacing: .2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 92%; }
   .level-btn .meta { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .lvl-progress { width: 90%; height: 5px; background: #0b0f1a; border-radius: 99px; overflow: hidden; margin-top: 4px; }
+  .lvl-progress__fill { height: 100%; background: linear-gradient(90deg, #6d28d9, #22d3ee); }
   .level-btn.locked { opacity: 0.5; filter: grayscale(0.5); }
   .level-btn.locked:after { content: '🔒'; margin-left: 6px; }
   .primary, .secondary { border: none; padding: 10px 18px; border-radius: 12px; box-shadow: var(--shadow); }

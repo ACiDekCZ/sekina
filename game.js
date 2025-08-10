@@ -58,6 +58,7 @@ const dom = {
   retry: document.getElementById('retry'),
   menuBtn: document.getElementById('menu-btn'),
   nextLevel: document.getElementById('next-level'),
+  menuBtnLevelComplete: document.getElementById('menu-btn-lc'),
   seedInput: document.getElementById('seed'),
   levels: document.getElementById('levels'),
   score: document.getElementById('score'),
@@ -1023,7 +1024,6 @@ dom.play?.addEventListener('click', () => {
   state.running = true;
   dom.menu.classList.remove('visible');
   dom.gameover.classList.remove('visible');
-  dom.how.classList.remove('visible');
   hint(true);
 });
 
@@ -1046,15 +1046,15 @@ dom.nextLevel?.addEventListener('click', () => {
   state.running = true;
 });
 
-dom.howBtn?.addEventListener('click', () => {
-  dom.menu.classList.remove('visible');
-  dom.how.classList.add('visible');
+dom.menuBtnLevelComplete?.addEventListener('click', () => {
+  // go back to main menu from level complete overlay
+  state.running = false;
+  dom.leveldone.classList.remove('visible');
+  dom.menu.classList.add('visible');
+  refreshLevelSelect();
 });
 
-dom.backBtn?.addEventListener('click', () => {
-  dom.how.classList.remove('visible');
-  dom.menu.classList.add('visible');
-});
+// How-to overlay removed from UI
 
 dom.share?.addEventListener('click', async () => {
   const text = `I played Sekina Dash! Score ${state.score}, best ${state.best}.`;

@@ -449,8 +449,9 @@ function createWorld() {
     timeUp: false,
     finalSectionEndX: null,
     finishX: null,
-    // rewind support (debug): last safe snapshot
-    lastSafe: null,
+    // rewind support (debug)
+    currentSectionIdx: -1,
+    lastSectionSnapshot: null,
     levelTimeLeft: LEVEL_DURATION_SEC,
     levelElapsed: 0
   };
@@ -861,6 +862,10 @@ function getLastSpawnX() {
 
 function spawnSection(section) {
   const base = world.spawnCursorX;
+  // When a new section is about to spawn, capture a snapshot BEFORE its obstacles appear
+  if (DEBUG) {
+    world.lastSectionSnapshot = captureSnapshot();
+  }
   const sectionPlatforms = section.items
     .filter(it => it.t === 'platform')
     .map(it => ({
@@ -908,9 +913,7 @@ function spawnSection(section) {
   }
   world.spawnCursorX += section.length;
   // record snapshot at the boundary for rewind (debug)
-  if (DEBUG) {
-    world.lastSafe = captureSnapshot();
-  }
+  // (handled at the top now as lastSectionSnapshot)
 }
 
 function spawnNext() {
@@ -923,7 +926,7 @@ function spawnNext() {
   world.sections.push({ index, startX: base, endX: base + sec.length });
   world.nextSectionIndex += 1;
   if (DEBUG) {
-    world.lastSafe = captureSnapshot();
+    world.currentSectionIdx = index;
   }
 }
 
@@ -1059,8 +1062,8 @@ function update(dt) {
         state.power.invulnUntil = world.time + 0.8;
         if (state.audioOn) sounds.hit(260, 0.06);
       } else {
-        if (DEBUG && dom.autoplay?.checked && world.lastSafe) {
-          restoreSnapshot(world.lastSafe);
+        if (DEBUG && dom.autoplay?.checked && world.lastSectionSnapshot) {
+          restoreSnapshot(world.lastSectionSnapshot);
           state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
           return; // resume from snapshot
         } else {
@@ -1091,8 +1094,8 @@ function update(dt) {
           state.power.invulnUntil = world.time + 0.8;
           if (state.audioOn) sounds.hit(260, 0.06);
         } else {
-          if (DEBUG && dom.autoplay?.checked && world.lastSafe) {
-            restoreSnapshot(world.lastSafe);
+          if (DEBUG && dom.autoplay?.checked && world.lastSectionSnapshot) {
+            restoreSnapshot(world.lastSectionSnapshot);
             state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
             return;
           } else {
@@ -1118,8 +1121,8 @@ function update(dt) {
         state.power.invulnUntil = world.time + 0.8;
         if (state.audioOn) sounds.hit(260, 0.06);
       } else {
-        if (DEBUG && dom.autoplay?.checked && world.lastSafe) {
-          restoreSnapshot(world.lastSafe);
+        if (DEBUG && dom.autoplay?.checked && world.lastSectionSnapshot) {
+          restoreSnapshot(world.lastSectionSnapshot);
           state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
           return;
         } else {

@@ -58,7 +58,9 @@ const state = {
   levelScore: 0,
   debugHitbox: false,
   uiToasts: [],
-  autoHoldUntil: 0
+  autoHoldUntil: 0,
+  autoHold2Until: 0,
+  autoPlan: null
 };
 
 const dom = {
@@ -480,6 +482,14 @@ function endGame() {
   dom.finalBest.textContent = state.best.toString();
   dom.gameover.classList.add('visible');
   shake();
+  // In debug autoplay, automatically retry the same level/seed until success
+  if (DEBUG && dom.autoplay?.checked) {
+    setTimeout(() => {
+      dom.gameover.classList.remove('visible');
+      startLevel(state.level || 1);
+      state.running = true;
+    }, 250);
+  }
 }
 
 function startLevel(levelNumber) {
@@ -505,13 +515,23 @@ function startLevel(levelNumber) {
 
   const seedValueRaw = (dom.seedInput?.value?.trim() || '').toLowerCase();
   let baseSeed = '';
-  if (DEBUG && menuVisible && seedValueRaw) {
-    baseSeed = seedValueRaw; // ruční seed v debug (jen z menu)
+  if (DEBUG) {
+    if (state.overrideBaseSeed) {
+      baseSeed = state.overrideBaseSeed;
+    } else if (menuVisible && seedValueRaw) {
+      baseSeed = seedValueRaw; // manual debug seed
+      state.overrideBaseSeed = baseSeed;
+    } else {
+      baseSeed = PRESET_LEVEL_SEEDS[(chosenLevel - 1) % PRESET_LEVEL_SEEDS.length] || `L${chosenLevel}`;
+      // if autoplay is on, lock base seed for consistent retries
+      if (dom.autoplay?.checked) state.overrideBaseSeed = baseSeed;
+    }
   } else {
     baseSeed = PRESET_LEVEL_SEEDS[(chosenLevel - 1) % PRESET_LEVEL_SEEDS.length] || `L${chosenLevel}`;
   }
   const seed = `${baseSeed}-L${chosenLevel}`;
   world.levelRng = createRng(seed);
+  world.seedStr = seed;
   world.obstacles.length = 0;
   world.platforms.length = 0;
   world.blocks.length = 0;
@@ -531,6 +551,11 @@ function startLevel(levelNumber) {
   world.spawnCursorX = viewport.width + 200; // start ahead of player
   // refresh level select UI (HS, lock states)
   refreshLevelSelect();
+  // autoplay recording reset in debug
+  if (DEBUG && dom.autoplay?.checked) {
+    state.autoPlan = null;
+    state.autoRecording = [];
+  }
 }
 
 function completeLevel() {
@@ -540,6 +565,15 @@ function completeLevel() {
   setHighscore(state.level || 1, state.levelScore || 0, ratioOk);
   unlockNextLevel(state.level || 1);
   refreshLevelSelect();
+  // Save successful autoplay replay for this level/seed (debug)
+  if (DEBUG && dom.autoplay?.checked && Array.isArray(state.autoRecording) && state.autoRecording.length > 0) {
+    try {
+      const key = `sekina_replay_L${state.level}`;
+      const meta = { seed: world.seedStr, level: state.level, when: Date.now() };
+      localStorage.setItem(key, JSON.stringify({ meta, actions: state.autoRecording }));
+      state.uiToasts.push({ id: Math.random(), text: 'Replay saved', born: world.time, dur: 1.2 });
+    } catch {}
+  }
 
   // auto-advance to the next level (if any)
   const current = state.level || 1;
@@ -577,7 +611,7 @@ function circleRectIntersect(cx, cy, r, rect) {
 }
 
 // --- Autoplay simulation helpers (debug) ---
-function simulatePressPlan(pressDelay, holdMs, allowDoubleJump, windowSec = 0.9) {
+function simulatePressPlan(pressDelay, holdMs, allowDoubleJump, windowSec = 1.2) {
   // Clone minimal player state
   const sim = {
     x: world.player.x,
@@ -678,7 +712,6 @@ function simulatePressPlan(pressDelay, holdMs, allowDoubleJump, windowSec = 0.9)
         sim.vy = -CONFIG.jumpImpulse * 0.9;
         sim.jumpHoldMs = 0;
         sim.usedDouble = true;
-        // after double, continue loop to see if it saves us
       } else {
         return false;
       }
@@ -853,6 +886,14 @@ function update(dt) {
   let pressedNow = inputs.consumePress();
   // DEBUG autoplay: more robust heuristic to finish levels
   if (DEBUG && dom.autoplay?.checked) {
+    // If we have a pending executable plan, follow it
+    if (state.autoPlan && world.time >= state.autoPlan.tPress && !state.autoPlan.used) {
+      pressedNow = true;
+      state.autoHoldUntil = world.time + state.autoPlan.hold;
+      state.autoPlan.used = true;
+      // record action for replay
+      (state.autoRecording ||= []).push({ t: world.time, action: 'press', hold: state.autoPlan.hold });
+    }
     const p = world.player;
     const lookahead = Math.max(90, Math.min(220, 140 + world.speed * 0.15));
     const futureX = p.x + lookahead;
@@ -895,21 +936,28 @@ function update(dt) {
       }
     }
 
-    if (needJump) {
-      // Validate timing by simulating a few candidate press timings and hold durations
-      let ok = false;
-      const candidates = [0.00, 0.02, -0.02]; // seconds offset
-      const holds = [0.08, 0.12, 0.16];
+    if (needJump && (!state.autoPlan || state.autoPlan.used)) {
+      // Build a plan with absolute press time in the near future
       const allowDouble = !!(state?.power?.doubleJumpUntil && world.time < state.power.doubleJumpUntil);
-      for (const off of candidates) {
+      // Search a denser grid of candidates around now
+      const offsets = [-0.06, -0.04, -0.02, 0.00, 0.02, 0.04, 0.06];
+      const holds = [0.06, 0.08, 0.10, 0.12, 0.16, 0.20];
+      let best = null;
+      for (const off of offsets) {
         for (const h of holds) {
-          if (simulatePressPlan(Math.max(0, off), h, allowDouble, 0.9)) { ok = true; state.autoHoldUntil = world.time + h; break; }
+          if (simulatePressPlan(Math.max(0, off), h, allowDouble, 1.4)) {
+            best = { tPress: world.time + Math.max(0, off), hold: h, used: false };
+            break;
+          }
         }
-        if (ok) break;
+        if (best) break;
       }
-      // fallback: basic press with minimal hold
-      if (!ok) state.autoHoldUntil = world.time + 0.1;
-      pressedNow = true;
+      if (best) {
+        state.autoPlan = best;
+      } else {
+        // conservative fallback plan (try immediate medium hold)
+        state.autoPlan = { tPress: world.time, hold: 0.12, used: false };
+      }
     }
   }
   if (player.onGround && pressedNow) {

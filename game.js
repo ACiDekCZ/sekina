@@ -57,7 +57,8 @@ const state = {
   score: 0,
   levelScore: 0,
   debugHitbox: false,
-  uiToasts: []
+  uiToasts: [],
+  autoHoldUntil: 0
 };
 
 const dom = {
@@ -732,33 +733,54 @@ function update(dt) {
 
   // jump
   let pressedNow = inputs.consumePress();
-  // DEBUG autoplay: simple heuristic to clear spikes/blocks/platform edges
+  // DEBUG autoplay: more robust heuristic to finish levels
   if (DEBUG && dom.autoplay?.checked) {
-    const lookahead = 120; // px ahead of player center
-    const px = world.player.x + lookahead;
-    const py = world.player.y;
-    // Check upcoming ground obstacle directly in lane
+    const p = world.player;
+    const lookahead = Math.max(90, Math.min(220, 140 + world.speed * 0.15));
+    const futureX = p.x + lookahead;
     let needJump = false;
+
+    // 1) Imminent ground obstacle (spike or block)
     for (const o of world.obstacles) {
-      if (o.x > world.player.x && o.x - world.player.x < 140) { needJump = true; break; }
+      const dx = o.x - p.x;
+      if (dx > 0 && dx < lookahead && o.y >= viewport.groundY - o.height - 2) { needJump = true; break; }
     }
-    // approaching platform gaps: if no platform directly under future x and player on ground -> jump
-    if (!needJump && world.player.onGround) {
-      const futureX = px;
-      let onPlatformSoon = false;
-      for (const p of world.platforms) {
-        if (futureX >= p.x - 10 && futureX <= p.x + p.width + 10) { onPlatformSoon = true; break; }
+    for (const b of world.blocks) {
+      const dx = b.x - p.x;
+      if (dx > 0 && dx < lookahead) { needJump = true; break; }
+    }
+
+    // 2) Platform end approaching while on platform
+    if (!needJump && p.onGround) {
+      for (const pf of world.platforms) {
+        const endDx = (pf.x + pf.width) - p.x;
+        if (endDx > 0 && endDx < 36 && p.y + p.height <= pf.y + 2) { needJump = true; break; }
       }
-      if (!onPlatformSoon) {
-        // if we are near the end of a platform, jump
-        for (const p of world.platforms) {
-          const nearEnd = Math.abs((p.x + p.width) - world.player.x) < 24;
-          if (nearEnd) { needJump = true; break; }
+    }
+
+    // 3) Top spikes ahead and current jump arc would hit them
+    if (!needJump && world.topSpikes) {
+      for (const t of world.topSpikes) {
+        const dx = t.x - p.x;
+        if (dx > 10 && dx < lookahead) {
+          // if player is high, avoid staying high: skip holding jump
+          // handled by reducing hold below
         }
       }
     }
+
+    // 4) Saws: if saw center crosses player x soon and we are low, jump
+    if (!needJump) {
+      for (const s of world.saws) {
+        const dx = s.x - p.x;
+        if (dx > 0 && dx < lookahead) { needJump = true; break; }
+      }
+    }
+
     if (needJump) {
       pressedNow = true;
+      // plan a brief hold for taller obstacles
+      state.autoHoldUntil = world.time + 0.12; // ~120ms
     }
   }
   if (player.onGround && pressedNow) {
@@ -771,7 +793,7 @@ function update(dt) {
     player.jumpHoldMs = 0;
     player.usedDoubleJumpInAir = true;
     if (state.audioOn) sounds.jump(740, 0.05);
-  } else if (!player.onGround && inputs.isJumping() && player.jumpHoldMs < CONFIG.maxJumpHoldMs) {
+  } else if (!player.onGround && ((inputs.isJumping() || (DEBUG && dom.autoplay?.checked && world.time < state.autoHoldUntil))) && player.jumpHoldMs < CONFIG.maxJumpHoldMs) {
     player.vy -= 900 * dt; // variable jump height
     player.jumpHoldMs += dt * 1000;
   }

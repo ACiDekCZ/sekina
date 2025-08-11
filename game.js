@@ -442,6 +442,14 @@ window.addEventListener('keydown', (e) => {
       restoreSnapshot(prev);
       state.uiToasts.push({ id: Math.random(), text: 'Rewind prev', born: world.time, dur: 0.8 });
     }
+  } else if (e.code === 'KeyS') {
+    e.preventDefault();
+    // restore latest confirmed autosave (do not pop)
+    const last = (world.gapSnapshots && world.gapSnapshots[world.gapSnapshots.length - 1]) || world.lastGapSnapshot;
+    if (last) {
+      restoreSnapshot(last);
+      state.uiToasts.push({ id: Math.random(), text: 'Rewind last', born: world.time, dur: 0.8 });
+    }
   }
 });
   return {
@@ -1013,21 +1021,23 @@ function spawnNext() {
   const beforePlat = world.platforms.length;
   const beforeBlk = world.blocks.length;
   const beforeTop = (world.topSpikes?.length || 0);
+  const beforeSaws = world.saws.length;
   spawnSection(sec);
   const newObs = world.obstacles.slice(beforeObs);
   const newPlat = world.platforms.slice(beforePlat);
   const newBlk = world.blocks.slice(beforeBlk);
   const newTop = (world.topSpikes || []).slice(beforeTop);
+  const newSaws = world.saws.slice(beforeSaws);
   let firstX = Infinity;
   let lastX = -Infinity;
-  for (const o of [...newObs, ...newPlat, ...newBlk, ...newTop]) {
-    if (!o) continue;
-    firstX = Math.min(firstX, o.x);
-    lastX = Math.max(lastX, (o.x + (o.width || 0)));
-  }
+  for (const o of newObs) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
+  for (const o of newPlat) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
+  for (const o of newBlk) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
+  for (const o of newTop) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
+  for (const s of newSaws) { const w = (s.r || 0) * 2; firstX = Math.min(firstX, s.x - w/2); lastX = Math.max(lastX, s.x + w/2); }
   // record section boundaries in world space
-  const startX = isFinite(firstX) ? Math.min(base, firstX) : base;
-  const endX = isFinite(lastX) ? Math.max(base + sec.length, lastX) : (base + sec.length);
+  const startX = isFinite(firstX) ? firstX : base;
+  const endX = isFinite(lastX) ? lastX : (base + sec.length);
   world.sections.push({ index, startX, endX });
   world.nextSectionIndex += 1;
   if (DEBUG) {

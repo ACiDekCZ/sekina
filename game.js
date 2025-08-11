@@ -8,7 +8,7 @@ const CONFIG = {
   player: { x: 120, width: 84, height: 56 },
   speed: 320, // start speed px/s
   speedGain: 0.22, // per second
-  startGapPx: 420, // fixed gap before first section (device-independent)
+  startGapPx: 720, // fixed gap before first section (device-independent)
   spawnAheadPx: 1600, // how far ahead to keep spawning (device-independent)
   // Pointy obstacles (spikes)
   obstacle: { minGap: 320, maxGap: 520, minWidth: 28, maxWidth: 46, minHeight: 40, maxHeight: 100 },
@@ -397,11 +397,14 @@ function createInputs(target) {
     // allow tap anywhere to jump, but only during active gameplay
     const gameActive = state.running && !dom.menu.classList.contains('visible') && !dom.gameover.classList.contains('visible') && !dom.leveldone.classList.contains('visible');
     if (!gameActive) return;
-    // Autoplay in DEBUG: simulate perfect jumps without input
-    if (DEBUG && (dom.autoplay?.checked)) return;
+    // In debug autoplay mode we still allow manual taps (we only record/rewind)
     e.preventDefault();
     if (!pressed.jump) pressed.justPressed = true;
     pressed.jump = true;
+    // record manual press for replay (debug autoplay recording)
+    if (DEBUG && dom.autoplay?.checked) {
+      (state.autoRecording ||= []).push({ t: world.time, action: 'press' });
+    }
     hint(false);
   };
   const end = (e) => { e.preventDefault(); pressed.jump = false; };
@@ -502,6 +505,10 @@ function startLevel(levelNumber) {
   world.levelTimeLeft = LEVEL_DURATION_SEC;
   world.speed = CONFIG.speed;
   world.distance = 0;
+  // place player safely on ground at start
+  world.player.y = viewport.groundY - world.player.height;
+  world.player.vy = 0;
+  world.player.onGround = true;
   state.levelScore = 0;
   // start-of-level furthest marker (from previous attempts)
   world.furthestRatioAtStart = getHighFor(levelNumber).furthest || 0;
@@ -933,82 +940,7 @@ function update(dt) {
 
   // jump
   let pressedNow = inputs.consumePress();
-  // DEBUG autoplay: more robust heuristic to finish levels
-  if (DEBUG && dom.autoplay?.checked) {
-    // If we have a pending executable plan, follow it
-    if (state.autoPlan && world.time >= state.autoPlan.tPress && !state.autoPlan.used) {
-      pressedNow = true;
-      state.autoHoldUntil = world.time + state.autoPlan.hold;
-      state.autoPlan.used = true;
-      // record action for replay
-      (state.autoRecording ||= []).push({ t: world.time, action: 'press', hold: state.autoPlan.hold });
-    }
-    const p = world.player;
-    const lookahead = Math.max(90, Math.min(220, 140 + world.speed * 0.15));
-    const futureX = p.x + lookahead;
-    let needJump = false;
-
-    // 1) Imminent ground obstacle (spike or block)
-    for (const o of world.obstacles) {
-      const dx = o.x - p.x;
-      if (dx > 0 && dx < lookahead && o.y >= viewport.groundY - o.height - 2) { needJump = true; break; }
-    }
-    for (const b of world.blocks) {
-      const dx = b.x - p.x;
-      if (dx > 0 && dx < lookahead) { needJump = true; break; }
-    }
-
-    // 2) Platform end approaching while on platform
-    if (!needJump && p.onGround) {
-      for (const pf of world.platforms) {
-        const endDx = (pf.x + pf.width) - p.x;
-        if (endDx > 0 && endDx < 36 && p.y + p.height <= pf.y + 2) { needJump = true; break; }
-      }
-    }
-
-    // 3) Top spikes ahead and current jump arc would hit them
-    if (!needJump && world.topSpikes) {
-      for (const t of world.topSpikes) {
-        const dx = t.x - p.x;
-        if (dx > 10 && dx < lookahead) {
-          // if player is high, avoid staying high: skip holding jump
-          // handled by reducing hold below
-        }
-      }
-    }
-
-    // 4) Saws: if saw center crosses player x soon and we are low, jump
-    if (!needJump) {
-      for (const s of world.saws) {
-        const dx = s.x - p.x;
-        if (dx > 0 && dx < lookahead) { needJump = true; break; }
-      }
-    }
-
-    if (needJump && (!state.autoPlan || state.autoPlan.used)) {
-      // Build a plan with absolute press time in the near future
-      const allowDouble = !!(state?.power?.doubleJumpUntil && world.time < state.power.doubleJumpUntil);
-      // Search a denser grid of candidates around now
-      const offsets = [-0.06, -0.04, -0.02, 0.00, 0.02, 0.04, 0.06];
-      const holds = [0.06, 0.08, 0.10, 0.12, 0.16, 0.20];
-      let best = null;
-      for (const off of offsets) {
-        for (const h of holds) {
-          if (simulatePressPlan(Math.max(0, off), h, allowDouble, 1.4)) {
-            best = { tPress: world.time + Math.max(0, off), hold: h, used: false };
-            break;
-          }
-        }
-        if (best) break;
-      }
-      if (best) {
-        state.autoPlan = best;
-      } else {
-        // conservative fallback plan (try immediate medium hold)
-        state.autoPlan = { tPress: world.time, hold: 0.12, used: false };
-      }
-    }
-  }
+  // Debug autoplay now does not auto-press; it only records (handled in input) and rewinds on fail
   if (player.onGround && pressedNow) {
     player.onGround = false;
     player.vy = -CONFIG.jumpImpulse;
@@ -1019,7 +951,7 @@ function update(dt) {
     player.jumpHoldMs = 0;
     player.usedDoubleJumpInAir = true;
     if (state.audioOn) sounds.jump(740, 0.05);
-  } else if (!player.onGround && ((inputs.isJumping() || (DEBUG && dom.autoplay?.checked && world.time < state.autoHoldUntil))) && player.jumpHoldMs < CONFIG.maxJumpHoldMs) {
+  } else if (!player.onGround && (inputs.isJumping()) && player.jumpHoldMs < CONFIG.maxJumpHoldMs) {
     player.vy -= 900 * dt; // variable jump height
     player.jumpHoldMs += dt * 1000;
   }

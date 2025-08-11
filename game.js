@@ -922,6 +922,7 @@ function getLastSpawnX() {
 
 function spawnSection(section) {
   const base = world.spawnCursorX;
+  const spawned = [];
   // When a new section is about to spawn, capture a snapshot BEFORE its obstacles appear
   if (DEBUG) {
     world.lastSectionSnapshot = captureSnapshot();

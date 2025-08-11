@@ -28,6 +28,9 @@ const CONFIG = {
   shakeOnHitMs: 450
 };
 
+// Fixed-step for deterministic replay
+const FIXED_DT = 1 / 120; // 120 Hz
+
 // Debug mode: allow selecting seed and level on the title screen
 // Enabled via URL parameter ?debug=1|true|on (or ?debug with no value)
 const DEBUG = (() => {
@@ -847,20 +850,26 @@ function spawnPlatform(xBase) {
 
 function spawnBlockAt(x, w, h) {
   const y = viewport.groundY - h;
-  world.blocks.push({ x: x + w, y, width: w, height: h });
+  const obj = { x: x + w, y, width: w, height: h };
+  world.blocks.push(obj);
+  return obj;
 }
 
 function spawnPlatformAt(x, w, rise) {
   const h = CONFIG.platform.height;
   const y = (viewport.groundY - rise) - h;
-  world.platforms.push({ x: x + w, y, width: w, height: h });
+  const obj = { x: x + w, y, width: w, height: h };
+  world.platforms.push(obj);
+  return obj;
 }
 
 function spawnSpikeAt(x, h) {
   const r = world.levelRng || Math.random;
   const w = Math.floor(r() * (CONFIG.obstacle.maxWidth - CONFIG.obstacle.minWidth + 1)) + CONFIG.obstacle.minWidth;
   const y = viewport.groundY - h;
-  world.obstacles.push({ x: x + w, y, width: w, height: h, passed: false });
+  const obj = { x: x + w, y, width: w, height: h, passed: false };
+  world.obstacles.push(obj);
+  return obj;
 }
 
 function spawnTopSpikeAt(x, w, h, yTop) {
@@ -868,13 +877,17 @@ function spawnTopSpikeAt(x, w, h, yTop) {
   const maxBottom = viewport.groundY - 140; // minimální clearance nad zemí
   const desiredTop = Math.max(0, (yTop ?? 0));
   const clampedTop = Math.min(desiredTop, Math.max(0, maxBottom - spikeHeight));
-  (world.topSpikes ||= []).push({ x: x + w, y: clampedTop, width: w, height: spikeHeight });
+  const obj = { x: x + w, y: clampedTop, width: w, height: spikeHeight };
+  (world.topSpikes ||= []).push(obj);
+  return obj;
 }
 
 function spawnSawAt(x, yFromGround, r, amp, speed) {
   const baseY = viewport.groundY - yFromGround;
   const rnd = world.levelRng || Math.random;
-  world.saws.push({ x: x + r * 2, baseY, r, amp, speed, phase: rnd() * Math.PI * 2 });
+  const obj = { x: x + r * 2, baseY, r, amp, speed, phase: rnd() * Math.PI * 2 };
+  world.saws.push(obj);
+  return obj;
 }
 
 function spawnCoinsLine(x, yFromGround, count, gap) {
@@ -944,9 +957,11 @@ function spawnSection(section) {
   for (const it of section.items) {
     const x = base + (it.dx || 0);
     if (it.t === 'platform') {
-      spawnPlatformAt(x, it.w ?? 160, it.rise ?? 100);
+      const obj = spawnPlatformAt(x, it.w ?? 160, it.rise ?? 100);
+      spawned.push({ type: 'platform', x: obj.x });
     } else if (it.t === 'spike') {
-      spawnSpikeAt(x, it.h ?? 70);
+      const obj = spawnSpikeAt(x, it.h ?? 70);
+      spawned.push({ type: 'spike', x: obj.x });
     } else if (it.t === 'topSpike') {
       let yTop;
       if (sectionPlatforms.length > 0) {
@@ -966,11 +981,14 @@ function spawnSection(section) {
         const targetBottom = Math.max(120, viewport.groundY - 220);
         yTop = Math.max(0, targetBottom - h);
       }
-      spawnTopSpikeAt(x, it.w ?? 32, it.h ?? 50, yTop);
+      const obj = spawnTopSpikeAt(x, it.w ?? 32, it.h ?? 50, yTop);
+      spawned.push({ type: 'topSpike', x: obj.x });
     } else if (it.t === 'block') {
-      spawnBlockAt(x, it.w ?? 120, it.h ?? 30);
+      const obj = spawnBlockAt(x, it.w ?? 120, it.h ?? 30);
+      spawned.push({ type: 'block', x: obj.x });
     } else if (it.t === 'saw') {
-      spawnSawAt(x, it.y ?? 140, it.r ?? 18, it.amp ?? 36, it.speed ?? 2.2);
+      const obj = spawnSawAt(x, it.y ?? 140, it.r ?? 18, it.amp ?? 36, it.speed ?? 2.2);
+      spawned.push({ type: 'saw', x: obj.x });
     } else if (it.t === 'coinsLine') {
       spawnCoinsLine(x, it.y ?? 160, it.count ?? 5, it.gap ?? 36);
     } else if (it.t === 'coinsArc') {
@@ -989,9 +1007,27 @@ function spawnNext() {
   const list = world.plannedSections;
   const sec = list[index % list.length] || createSectionFor(state.level || 1, 0.9);
   const base = world.spawnCursorX;
+  // capture spawned obstacle positions to define exact section bounds
+  const beforeObs = world.obstacles.length;
+  const beforePlat = world.platforms.length;
+  const beforeBlk = world.blocks.length;
+  const beforeTop = (world.topSpikes?.length || 0);
   spawnSection(sec);
+  const newObs = world.obstacles.slice(beforeObs);
+  const newPlat = world.platforms.slice(beforePlat);
+  const newBlk = world.blocks.slice(beforeBlk);
+  const newTop = (world.topSpikes || []).slice(beforeTop);
+  let firstX = Infinity;
+  let lastX = -Infinity;
+  for (const o of [...newObs, ...newPlat, ...newBlk, ...newTop]) {
+    if (!o) continue;
+    firstX = Math.min(firstX, o.x);
+    lastX = Math.max(lastX, (o.x + (o.width || 0)));
+  }
   // record section boundaries in world space
-  world.sections.push({ index, startX: base, endX: base + sec.length });
+  const startX = isFinite(firstX) ? Math.min(base, firstX) : base;
+  const endX = isFinite(lastX) ? Math.max(base + sec.length, lastX) : (base + sec.length);
+  world.sections.push({ index, startX, endX });
   world.nextSectionIndex += 1;
   if (DEBUG) {
     world.currentSectionIdx = index;
@@ -1637,7 +1673,7 @@ function drawPowerups(ctx) {
 
 function draw(timestamp) {
   const ts = timestamp || performance.now();
-  const dt = Math.min(0.032, (ts - lastTs) / 1000 || 0);
+  let dt = Math.min(0.032, (ts - lastTs) / 1000 || 0);
   lastTs = ts;
 
   resizeCanvasToCSSPixels();
@@ -1646,19 +1682,26 @@ function draw(timestamp) {
   drawBackground(ctx);
 
   if (state.running) {
-    // If playing a replay, inject down/up events precisely
-    if (state.replay && state.replay.actions) {
-      const tRel = world.time - (state.replayStartTime || 0);
-      while (true) {
-        const idx = state.replayPtr || 0;
-        const next = state.replay.actions[idx];
-        if (!next || tRel < (next.t || 0)) break;
-        if (next.action === 'down') state._injectDown = true;
-        else if (next.action === 'up') state._injectUp = true;
-        state.replayPtr = idx + 1;
+    // Deterministic fixed-step loop for replay (and normal run)
+    // Accumulate dt and step in FIXED_DT increments
+    if (!state._accum) state._accum = 0;
+    state._accum = Math.min(0.25, state._accum + dt);
+    while (state._accum >= FIXED_DT) {
+      state._accum -= FIXED_DT;
+      // If playing a replay, inject down/up events precisely aligned to world.time
+      if (state.replay && state.replay.actions) {
+        const tRel = world.time - (state.replayStartTime || 0);
+        while (true) {
+          const idx = state.replayPtr || 0;
+          const next = state.replay.actions[idx];
+          if (!next || tRel < (next.t || 0)) break;
+          if (next.action === 'down') state._injectDown = true;
+          else if (next.action === 'up') state._injectUp = true;
+          state.replayPtr = idx + 1;
+        }
       }
+      update(FIXED_DT);
     }
-    update(dt);
   }
   drawPlatforms(ctx);
   drawBlocks(ctx);

@@ -470,11 +470,9 @@ function endGame() {
   state.running = false;
   dom.finalScore.textContent = state.score.toString();
   // highscore per-level
-  setHighscore(state.level || 1, state.score);
-  // save furthest reached distance ratio even on fail
   const totalEnd = estimateLevelDistanceWithPlanPx(state.level || 1);
   const ratioEnd = totalEnd > 0 ? Math.max(0, Math.min(1, (world.distance + (world.player?.x || 0)) / totalEnd)) : 0;
-  setFurthestRatio(state.level || 1, ratioEnd);
+  setHighscore(state.level || 1, state.score, ratioEnd);
   state.best = Math.max(state.best, state.score);
   localStorage.setItem('sekina_best', String(state.best));
   dom.best.textContent = state.best.toString();
@@ -491,7 +489,7 @@ function startLevel(levelNumber) {
   world.distance = 0;
   state.levelScore = 0;
   // start-of-level furthest marker (from previous attempts)
-  world.furthestRatioAtStart = getFurthestRatio(levelNumber);
+  world.furthestRatioAtStart = getHighFor(levelNumber).furthest || 0;
   // Deterministic RNG for level
   // Priority: in DEBUG mode you can set seed and level from menu
   let chosenLevel = levelNumber;

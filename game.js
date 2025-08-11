@@ -17,7 +17,21 @@ const CONFIG = {
 };
 
 // Debug mode: allow selecting seed and level on the title screen
-const DEBUG = false;
+// Enabled via URL parameter ?debug=1|true|on (or ?debug with no value)
+const DEBUG = (() => {
+  try {
+    const params = new URLSearchParams(window.location.search);
+    const v = params.get('debug');
+    if (v === '' || v === '1') return true;
+    if (typeof v === 'string') {
+      const t = v.toLowerCase();
+      return t === 'true' || t === 'on' || t === 'yes';
+    }
+    return false;
+  } catch {
+    return false;
+  }
+})();
 
 // Preset seeds for 10 levels (tweak as needed)
 const PRESET_LEVEL_SEEDS = [
@@ -42,7 +56,8 @@ const state = {
   best: Number(localStorage.getItem('sekina_best') || 0),
   score: 0,
   levelScore: 0,
-  debugHitbox: false
+  debugHitbox: false,
+  uiToasts: []
 };
 
 const dom = {
@@ -60,6 +75,7 @@ const dom = {
   nextLevel: document.getElementById('next-level'),
   menuBtnLevelComplete: document.getElementById('menu-btn-lc'),
   seedInput: document.getElementById('seed'),
+  autoplay: document.getElementById('autoplay'),
   levels: document.getElementById('levels'),
   score: document.getElementById('score'),
   best: document.getElementById('best'),
@@ -152,8 +168,7 @@ function buildLevelSelect() {
     const scoreVal = Number(hf.score || 0);
     btn.innerHTML = `
       <div class="title">L${lv.id} · ${lv.title}</div>
-      <div class="meta">HS ${scoreVal}</div>
-      <div class="lvl-progress" aria-hidden="true"><div class="lvl-progress__fill" style="width:${furPercent}%"></div></div>
+      <div class="meta">HS ${scoreVal} · ${furPercent}%</div>
     `;
     btn.addEventListener('click', () => {
       // v debug lze skákat kamkoliv, jinak pouze odemčené
@@ -377,6 +392,8 @@ function createInputs(target) {
     // allow tap anywhere to jump, but only during active gameplay
     const gameActive = state.running && !dom.menu.classList.contains('visible') && !dom.gameover.classList.contains('visible') && !dom.leveldone.classList.contains('visible');
     if (!gameActive) return;
+    // Autoplay in DEBUG: simulate perfect jumps without input
+    if (DEBUG && (dom.autoplay?.checked)) return;
     e.preventDefault();
     if (!pressed.jump) pressed.justPressed = true;
     pressed.jump = true;
@@ -716,7 +733,36 @@ function update(dt) {
   player.vy += CONFIG.gravity * dt;
 
   // jump
-  const pressedNow = inputs.consumePress();
+  let pressedNow = inputs.consumePress();
+  // DEBUG autoplay: simple heuristic to clear spikes/blocks/platform edges
+  if (DEBUG && dom.autoplay?.checked) {
+    const lookahead = 120; // px ahead of player center
+    const px = world.player.x + lookahead;
+    const py = world.player.y;
+    // Check upcoming ground obstacle directly in lane
+    let needJump = false;
+    for (const o of world.obstacles) {
+      if (o.x > world.player.x && o.x - world.player.x < 140) { needJump = true; break; }
+    }
+    // approaching platform gaps: if no platform directly under future x and player on ground -> jump
+    if (!needJump && world.player.onGround) {
+      const futureX = px;
+      let onPlatformSoon = false;
+      for (const p of world.platforms) {
+        if (futureX >= p.x - 10 && futureX <= p.x + p.width + 10) { onPlatformSoon = true; break; }
+      }
+      if (!onPlatformSoon) {
+        // if we are near the end of a platform, jump
+        for (const p of world.platforms) {
+          const nearEnd = Math.abs((p.x + p.width) - world.player.x) < 24;
+          if (nearEnd) { needJump = true; break; }
+        }
+      }
+    }
+    if (needJump) {
+      pressedNow = true;
+    }
+  }
   if (player.onGround && pressedNow) {
     player.onGround = false;
     player.vy = -CONFIG.jumpImpulse;
@@ -908,8 +954,12 @@ function update(dt) {
       if (b.type === 'shield') {
         state.power.shieldHits = Math.min(1, (state.power.shieldHits || 0) + 1);
       } else if (b.type === 'double') {
-        state.power.doubleJumpUntil = world.time + 9; // 9s dvojskok
+        state.power.doubleJumpUntil = world.time + 9; // 9s double jump
+        state.power.doubleJumpTotal = 9;
       }
+      // toast
+      const toastText = b.type === 'shield' ? 'Shield +1' : 'Double jump active';
+      state.uiToasts.push({ id: Math.random(), text: toastText, born: world.time, dur: 1.2 });
       state.score += 2;
       state.levelScore += 2;
       dom.score.textContent = String(state.score);
@@ -1141,6 +1191,79 @@ function drawCoins(ctx) {
   ctx.restore();
 }
 
+function drawPowerups(ctx) {
+  const margin = 12;
+  let x = margin;
+  const y = margin;
+  const size = 28;
+  ctx.save();
+  ctx.globalAlpha = 0.95;
+  // Background pill depending on visible powerups
+  const showShield = (state?.power?.shieldHits || 0) > 0;
+  const djLeft = Math.max(0, (state?.power?.doubleJumpUntil || 0) - world.time);
+  const showDJ = djLeft > 0.05;
+  if (showShield || showDJ) {
+    const count = (showShield ? 1 : 0) + (showDJ ? 1 : 0);
+    const pillW = count * (size + 10) + 12;
+    ctx.fillStyle = '#0b0f1acc';
+    ctx.strokeStyle = '#ffffff1a';
+    ctx.lineWidth = 1.5;
+    const r = 12;
+    const px = 6;
+    const py = 6;
+    // rounded rect
+    ctx.beginPath();
+    ctx.moveTo(px + r, py);
+    ctx.arcTo(px + pillW, py, px + pillW, py + r, r);
+    ctx.arcTo(px + pillW, py + size + 12, px + pillW - r, py + size + 12, r);
+    ctx.arcTo(px, py + size + 12, px, py + size + 12 - r, r);
+    ctx.arcTo(px, py, px + r, py, r);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+
+    let drawX = px + 8;
+    if (showShield) {
+      if (sprites.shield && sprites.shield.complete) {
+        ctx.drawImage(sprites.shield, drawX, py + 8, size, size);
+      } else {
+        ctx.fillStyle = '#60a5fa';
+        ctx.fillRect(drawX, py + 8, size, size);
+      }
+      // hits label
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 12px system-ui, sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`x${Math.max(0, state?.power?.shieldHits || 0)}`, drawX + size + 4, py + 26);
+      drawX += size + 34;
+    }
+    if (showDJ) {
+      if (sprites.feather && sprites.feather.complete) {
+        ctx.drawImage(sprites.feather, drawX, py + 8, size, size);
+      } else {
+        ctx.fillStyle = '#f472b6';
+        ctx.fillRect(drawX, py + 8, size, size);
+      }
+      const total = Math.max(0.1, state?.power?.doubleJumpTotal || 9);
+      const ratio = Math.max(0, Math.min(1, djLeft / total));
+      // time bar under icon
+      const barW = size;
+      const barH = 5;
+      const bx = drawX;
+      const by = py + 8 + size + 4;
+      ctx.fillStyle = '#0f1426';
+      ctx.fillRect(bx, by, barW, barH);
+      const grad = ctx.createLinearGradient(bx, 0, bx + barW, 0);
+      grad.addColorStop(0, '#22d3ee');
+      grad.addColorStop(1, '#6d28d9');
+      ctx.fillStyle = grad;
+      ctx.fillRect(bx, by, Math.floor(barW * ratio), barH);
+      drawX += size + 18;
+    }
+  }
+  ctx.restore();
+}
+
 function draw(timestamp) {
   const ts = timestamp || performance.now();
   const dt = Math.min(0.032, (ts - lastTs) / 1000 || 0);
@@ -1158,6 +1281,53 @@ function draw(timestamp) {
   drawObstacles(ctx);
   drawCoins(ctx);
   drawBonuses(ctx);
+  drawPowerups(ctx);
+  // toasts (top-center, subtle)
+  if (state.uiToasts && state.uiToasts.length) {
+    const now = world.time;
+    const cx = Math.floor(viewport.width / 2);
+    let y = 18;
+    const next = [];
+    for (const t of state.uiToasts) {
+      const age = now - t.born;
+      const life = t.dur || 1.2;
+      if (age < 0 || age > life + 0.3) continue;
+      const a = age < life ? 1 : Math.max(0, 1 - (age - life) / 0.3);
+      const slide = Math.min(1, age / 0.15);
+      const offY = Math.floor((1 - slide) * -10);
+      ctx.save();
+      ctx.globalAlpha = a * 0.95;
+      ctx.fillStyle = '#0b0f1acc';
+      ctx.strokeStyle = '#ffffff1a';
+      ctx.lineWidth = 1;
+      ctx.textAlign = 'center';
+      ctx.font = '600 14px system-ui, sans-serif';
+      const padX = 12, padY = 6;
+      const textW = Math.ceil(ctx.measureText(t.text).width);
+      const w = textW + padX * 2;
+      const h = 26;
+      const x0 = cx - Math.floor(w / 2);
+      const y0 = y + offY;
+      // pill
+      ctx.beginPath();
+      const r = 12;
+      ctx.moveTo(x0 + r, y0);
+      ctx.arcTo(x0 + w, y0, x0 + w, y0 + r, r);
+      ctx.arcTo(x0 + w, y0 + h, x0 + w - r, y0 + h, r);
+      ctx.arcTo(x0, y0 + h, x0, y0 + h - r, r);
+      ctx.arcTo(x0, y0, x0 + r, y0, r);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+      // text
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillText(t.text, cx, y0 + 18);
+      ctx.restore();
+      y += h + 6;
+      if (age < life + 0.3) next.push(t);
+    }
+    state.uiToasts = next;
+  }
   drawPlayer(ctx);
 
   // debug hitbox
@@ -1229,12 +1399,15 @@ dom.mute?.addEventListener('click', () => {
 window.addEventListener('load', () => {
   const seedRow = document.getElementById('seed-row');
   const levelRow = document.getElementById('level-row');
+  const autoplayRow = document.getElementById('autoplay-row');
   if (!DEBUG) {
     seedRow?.classList.add('hidden');
     levelRow?.classList.add('hidden');
+    autoplayRow?.classList.add('hidden');
   } else {
     seedRow?.classList.remove('hidden');
     levelRow?.classList.remove('hidden');
+    autoplayRow?.classList.remove('hidden');
   }
 });
 

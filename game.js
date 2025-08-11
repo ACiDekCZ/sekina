@@ -1,18 +1,10 @@
 // Embedded demo replays (author-provided), per level id
 const DEMO_REPLAYS = {
-  1: {
-    meta: { seed: 'L1-default-L1' },
-    actions: [
-      { t: 0.30, action: 'press' },
-      { t: 0.86, action: 'press' },
-      { t: 1.42, action: 'press' },
-      { t: 1.98, action: 'press' },
-      { t: 2.54, action: 'press' },
-      { t: 3.10, action: 'press' },
-      { t: 3.66, action: 'press' }
-    ]
-  }
+  
+  1: {"meta":{"seed":"2-L1","level":1,"when":1754908892697},"actions":[{"t":2.4169999999999994,"action":"press"},{"t":3.4672999999999967,"action":"press"},{"t":5.149900000000007,"action":"press"},{"t":6.183300000000017,"action":"press"},{"t":7.000900000000024,"action":"press"},{"t":10.533499999999995,"action":"press"},{"t":11.450499999999982,"action":"press"},{"t":15.718099999999934,"action":"press"},{"t":16.551399999999923,"action":"press"},{"t":17.55159999999989,"action":"press"},{"t":20.451699999999814,"action":"press"},{"t":21.568499999999798,"action":"press"},{"t":25.635299999999685,"action":"press"},{"t":30.185599999999518,"action":"press"},{"t":31.818999999999477,"action":"press"},{"t":35.418399999999686,"action":"press"},{"t":36.35259999999975,"action":"press"},{"t":35.41739999999966,"action":"press"},{"t":36.41739999999973,"action":"press"},{"t":41.385300000000086,"action":"press"},{"t":41.4020000000001,"action":"press"},{"t":41.45210000000009,"action":"press"},{"t":40.71770000000004,"action":"press"},{"t":40.71780000000004,"action":"press"},{"t":41.4851000000001,"action":"press"},{"t":40.70110000000005,"action":"press"},{"t":41.5184000000001,"action":"press"},{"t":42.568700000000156,"action":"press"},{"t":41.351700000000086,"action":"press"},{"t":41.502200000000066,"action":"press"},{"t":42.4693000000001,"action":"press"},{"t":41.517700000000076,"action":"press"},{"t":42.50220000000014,"action":"press"},{"t":41.45090000000007,"action":"press"},{"t":42.48540000000012,"action":"press"},{"t":41.48520000000007,"action":"press"},{"t":42.55220000000012,"action":"press"},{"t":41.568600000000096,"action":"press"},{"t":41.3687000000001,"action":"press"},{"t":41.20190000000009,"action":"press"},{"t":42.05190000000013,"action":"press"},{"t":41.16860000000007,"action":"press"},{"t":42.085400000000135,"action":"press"},{"t":41.21870000000008,"action":"press"},{"t":41.235400000000084,"action":"press"},{"t":41.06870000000007,"action":"press"},{"t":40.90200000000005,"action":"press"},{"t":40.91860000000005,"action":"press"},{"t":41.118600000000065,"action":"press"},{"t":41.21870000000007,"action":"press"},{"t":42.05200000000011,"action":"press"},{"t":43.06880000000017,"action":"press"},{"t":47.985800000000445,"action":"press"},{"t":49.30250000000052,"action":"press"},{"t":53.702700000000775,"action":"press"},{"t":59.50310000000115,"action":"press"},{"t":60.26970000000119,"action":"press"},{"t":60.61980000000123,"action":"press"}]}
 };
+
+
 
 function hasEmbeddedDemo(levelId){ return !!DEMO_REPLAYS[levelId]; }
 function getEmbeddedDemo(levelId){ return DEMO_REPLAYS[levelId]; }
@@ -609,6 +601,7 @@ function captureSnapshot() {
     distance: world.distance,
     levelTimeLeft: world.levelTimeLeft,
     levelElapsed: world.levelElapsed,
+    power: { ...(state.power || {}) },
     player: { ...world.player },
     obstacles: world.obstacles.map(o => ({ ...o })),
     platforms: world.platforms.map(p => ({ ...p })),
@@ -629,6 +622,7 @@ function restoreSnapshot(s) {
   world.distance = s.distance;
   if (typeof s.levelTimeLeft === 'number') world.levelTimeLeft = s.levelTimeLeft;
   if (typeof s.levelElapsed === 'number') world.levelElapsed = s.levelElapsed;
+  if (s.power) state.power = { ...s.power };
   world.player = { ...s.player };
   world.obstacles = s.obstacles.map(o => ({ ...o }));
   world.platforms = s.platforms.map(p => ({ ...p }));

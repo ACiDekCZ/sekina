@@ -456,7 +456,8 @@ function createWorld() {
     currentSectionIdx: -1,
     lastSectionSnapshot: null,
     lastGapSnapshot: null,
-    lastGapSectionIndex: -1,
+    lastGapMidX: null,
+    pendingGapMidX: null,
     levelTimeLeft: LEVEL_DURATION_SEC,
     levelElapsed: 0
   };
@@ -893,12 +894,8 @@ function spawnSection(section) {
     const gapStart = prevEnd;
     const gapEnd = base;
     const gapMid = Math.floor((gapStart + gapEnd) / 2);
-    // To place player at gapMid on restore, we capture snapshot and encode target world.distance
-    const gapSnap = captureSnapshot();
-    // distanceOverride = desiredWorldX - player.x
-    gapSnap.distanceOverride = Math.max(0, gapMid - world.player.x);
-    world.lastGapSnapshot = gapSnap;
-    world.lastGapSectionIndex = world.sections.length; // index of upcoming section
+    // Defer saving the gap snapshot until player skutečně projde přes gapMid (bude vidět za ním)
+    world.pendingGapMidX = gapMid;
   }
   const sectionPlatforms = section.items
     .filter(it => it.t === 'platform')
@@ -1031,6 +1028,19 @@ function update(dt) {
   if (!world.stopSpawning) {
     while ((getLastSpawnX() - world.distance) < (CONFIG.spawnAheadPx)) {
       spawnNext();
+    }
+  }
+
+  // If we have a pending gap midpoint and player prošel za něj, potvrď gap snapshot
+  if (DEBUG && dom.autoplay?.checked && typeof world.pendingGapMidX === 'number') {
+    const playerWorldX = world.distance + world.player.x;
+    if (playerWorldX > world.pendingGapMidX) {
+      const gapSnap = captureSnapshot();
+      // align snapshot so that on restore jsme uprostřed gapu
+      gapSnap.distanceOverride = Math.max(0, world.pendingGapMidX - world.player.x);
+      world.lastGapSnapshot = gapSnap;
+      world.lastGapMidX = world.pendingGapMidX;
+      world.pendingGapMidX = null;
     }
   }
 
@@ -1718,11 +1728,14 @@ window.addEventListener('load', () => {
     levelRow?.classList.add('hidden');
     autoplayRow?.classList.add('hidden');
     document.getElementById('rewind-row')?.classList.add('hidden');
+    dom.stopReplay?.classList.add('hidden');
   } else {
     seedRow?.classList.remove('hidden');
     levelRow?.classList.remove('hidden');
     autoplayRow?.classList.remove('hidden');
     document.getElementById('rewind-row')?.classList.remove('hidden');
+    // stop replay button only if autoplay debug is visible
+    dom.stopReplay?.classList.add('hidden');
   }
 });
 

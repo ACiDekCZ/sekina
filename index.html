@@ -19,7 +19,10 @@
         <span id="score">0</span>
         <span id="best" title="Best score">0</span>
       </div>
-      <button id="mute" class="icon-btn" aria-label="Sound on/off" title="Sound">🔊</button>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button id="stop-replay" class="icon-btn hidden" aria-label="Stop replay" title="Stop replay">⏹</button>
+        <button id="mute" class="icon-btn" aria-label="Sound on/off" title="Sound">🔊</button>
+      </div>
     </header>
 
     <main id="game-root" role="application" aria-label="Sekina Dash – game">
@@ -61,7 +64,7 @@
         <p>Best: <strong id="final-best">0</strong></p>
         <div class="controls">
           <button id="retry" class="primary">Retry</button>
-          
+          <button id="watch-replay" class="secondary hidden">Watch replay</button>
           <button id="menu-btn" class="secondary">Main Menu</button>
         </div>
       </div>
@@ -71,6 +74,7 @@
         <p>Great! Ready for the next challenge?</p>
         <div class="controls">
           <button id="next-level" class="primary">Next level</button>
+          <button id="copy-replay" class="secondary hidden">Copy replay JSON</button>
           <button id="menu-btn-lc" class="secondary">Main Menu</button>
         </div>
       </div>

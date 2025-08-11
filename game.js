@@ -81,6 +81,9 @@ const dom = {
   menuBtnLevelComplete: document.getElementById('menu-btn-lc'),
   seedInput: document.getElementById('seed'),
   autoplay: document.getElementById('autoplay'),
+  copyReplay: document.getElementById('copy-replay'),
+  watchReplay: document.getElementById('watch-replay'),
+  stopReplay: document.getElementById('stop-replay'),
   levels: document.getElementById('levels'),
   score: document.getElementById('score'),
   best: document.getElementById('best'),
@@ -452,6 +455,8 @@ function createWorld() {
     // rewind support (debug)
     currentSectionIdx: -1,
     lastSectionSnapshot: null,
+    lastGapSnapshot: null,
+    lastGapSectionIndex: -1,
     levelTimeLeft: LEVEL_DURATION_SEC,
     levelElapsed: 0
   };
@@ -490,6 +495,12 @@ function endGame() {
   dom.finalBest.textContent = state.best.toString();
   dom.gameover.classList.add('visible');
   shake();
+  // watch replay offer after 5 fails if replay exists
+  failCount += 1;
+  const key = `sekina_replay_L${state.level || 1}`;
+  if (failCount >= 5 && localStorage.getItem(key)) {
+    dom.watchReplay?.classList.remove('hidden');
+  }
   // In debug autoplay, automatically retry the same level/seed until success
   if (DEBUG && dom.autoplay?.checked) {
     setTimeout(() => {
@@ -606,6 +617,13 @@ function restoreSnapshot(s) {
   world.topSpikes = s.topSpikes.map(t => ({ ...t }));
   world.spawnCursorX = s.spawnCursorX;
   world.nextSectionIndex = s.nextSectionIndex;
+  // If we annotated a desired world X (gap midpoint), align player's world position there
+  if (typeof s.worldX === 'number') {
+    const desiredWorldX = s.worldX;
+    // set distance so that player's current screen x maps to desired world x
+    // worldX(player) = world.distance + player.x
+    world.distance = Math.max(0, desiredWorldX - world.player.x);
+  }
 }
 
 function completeLevel() {
@@ -613,7 +631,7 @@ function completeLevel() {
   const totalOk = estimateLevelDistanceWithPlanPx(state.level || 1);
   const ratioOk = totalOk > 0 ? Math.max(0, Math.min(1, (world.distance + (world.player?.x || 0)) / totalOk)) : 0;
   setHighscore(state.level || 1, state.levelScore || 0, ratioOk);
-  unlockNextLevel(state.level || 1);
+  setUnlocked(state.level || 1);
   refreshLevelSelect();
   // Save successful autoplay replay for this level/seed (debug)
   if (DEBUG && dom.autoplay?.checked && Array.isArray(state.autoRecording) && state.autoRecording.length > 0) {
@@ -622,6 +640,8 @@ function completeLevel() {
       const meta = { seed: world.seedStr, level: state.level, when: Date.now() };
       localStorage.setItem(key, JSON.stringify({ meta, actions: state.autoRecording }));
       state.uiToasts.push({ id: Math.random(), text: 'Replay saved', born: world.time, dur: 1.2 });
+      // show copy button
+      dom.copyReplay?.classList.remove('hidden');
     } catch {}
   }
 
@@ -865,6 +885,18 @@ function spawnSection(section) {
   // When a new section is about to spawn, capture a snapshot BEFORE its obstacles appear
   if (DEBUG) {
     world.lastSectionSnapshot = captureSnapshot();
+    // Also capture the gap snapshot a bit before the start (middle of gap):
+    // we compute the midpoint between previous end and new section start.
+    const prev = world.sections[world.sections.length - 1];
+    const prevEnd = prev ? prev.endX : 0;
+    const gapStart = prevEnd;
+    const gapEnd = base;
+    const gapMid = Math.floor((gapStart + gapEnd) / 2);
+    // To place player at gapMid on restore, we capture snapshot and encode target world.distance
+    const gapSnap = captureSnapshot();
+    gapSnap.worldX = gapMid; // annotate desired world X for player position restoration
+    world.lastGapSnapshot = gapSnap;
+    world.lastGapSectionIndex = world.sections.length; // index of upcoming section
   }
   const sectionPlatforms = section.items
     .filter(it => it.t === 'platform')
@@ -942,7 +974,8 @@ function update(dt) {
   player.vy += CONFIG.gravity * dt;
 
   // jump
-  let pressedNow = inputs.consumePress();
+  let pressedNow = inputs.consumePress() || !!state._injectPress;
+  state._injectPress = false;
   // Debug autoplay now does not auto-press; it only records (handled in input) and rewinds on fail
   if (player.onGround && pressedNow) {
     player.onGround = false;
@@ -1062,8 +1095,8 @@ function update(dt) {
         state.power.invulnUntil = world.time + 0.8;
         if (state.audioOn) sounds.hit(260, 0.06);
       } else {
-        if (DEBUG && dom.autoplay?.checked && world.lastSectionSnapshot) {
-          restoreSnapshot(world.lastSectionSnapshot);
+        if (DEBUG && dom.autoplay?.checked && world.lastGapSnapshot) {
+          restoreSnapshot(world.lastGapSnapshot);
           state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
           return; // resume from snapshot
         } else {
@@ -1094,8 +1127,8 @@ function update(dt) {
           state.power.invulnUntil = world.time + 0.8;
           if (state.audioOn) sounds.hit(260, 0.06);
         } else {
-          if (DEBUG && dom.autoplay?.checked && world.lastSectionSnapshot) {
-            restoreSnapshot(world.lastSectionSnapshot);
+          if (DEBUG && dom.autoplay?.checked && world.lastGapSnapshot) {
+            restoreSnapshot(world.lastGapSnapshot);
             state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
             return;
           } else {
@@ -1121,8 +1154,8 @@ function update(dt) {
         state.power.invulnUntil = world.time + 0.8;
         if (state.audioOn) sounds.hit(260, 0.06);
       } else {
-        if (DEBUG && dom.autoplay?.checked && world.lastSectionSnapshot) {
-          restoreSnapshot(world.lastSectionSnapshot);
+        if (DEBUG && dom.autoplay?.checked && world.lastGapSnapshot) {
+          restoreSnapshot(world.lastGapSnapshot);
           state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
           return;
         } else {
@@ -1473,7 +1506,21 @@ function draw(timestamp) {
   ctx.clearRect(0, 0, viewport.width, viewport.height);
   drawBackground(ctx);
 
-  if (state.running) update(dt);
+  if (state.running) {
+    // If playing a replay, inject press events at scheduled times
+    if (state.replay && state.replay.actions) {
+      const tRel = world.time - (state.replayStartTime || 0);
+      const next = state.replay.actions[state.replayPtr || 0];
+      if (next && tRel >= (next.t || 0)) {
+        // simulate an input press by queuing it in inputs
+        // We cannot directly poke inputs; instead, call a minimal hook:
+        // set a small flag to be consumed in update()
+        state._injectPress = true;
+        state.replayPtr += 1;
+      }
+    }
+    update(dt);
+  }
   drawPlatforms(ctx);
   drawBlocks(ctx);
   drawSaws(ctx);
@@ -1564,6 +1611,32 @@ document.getElementById('pause-autoplay')?.addEventListener('click', () => {
   (state.uiToasts ||= []).push({ id: Math.random(), text: state.running ? 'Resume' : 'Paused', born: world.time, dur: 0.8 });
 });
 
+// Watch replay handler
+dom.watchReplay?.addEventListener('click', () => {
+  const key = `sekina_replay_L${state.level || 1}`;
+  const val = localStorage.getItem(key);
+  if (!val) return;
+  try {
+    const replay = JSON.parse(val);
+    startLevel(state.level || 1);
+    // attach replay to state
+    state.replay = replay;
+    state.replayPtr = 0;
+    state.replayStartTime = world.time;
+    state.running = true;
+    dom.gameover.classList.remove('visible');
+    dom.stopReplay?.classList.remove('hidden');
+  } catch {}
+});
+
+dom.stopReplay?.addEventListener('click', () => {
+  // stop replay and show menu
+  state.replay = null;
+  state.running = false;
+  dom.stopReplay?.classList.add('hidden');
+  dom.menu.classList.add('visible');
+});
+
 dom.menuBtn?.addEventListener('click', () => {
   // go back to main menu from game over
   state.running = false;
@@ -1582,6 +1655,20 @@ dom.nextLevel?.addEventListener('click', () => {
   state.running = true;
   document.getElementById('app')?.classList.add('playing');
 });
+
+// Copy replay JSON (debug)
+dom.copyReplay?.addEventListener('click', async () => {
+  try {
+    const key = `sekina_replay_L${state.level || 1}`;
+    const val = localStorage.getItem(key) || '';
+    if (!val) return;
+    await navigator.clipboard.writeText(val);
+    state.uiToasts.push({ id: Math.random(), text: 'Copied!', born: world.time, dur: 0.8 });
+  } catch {}
+});
+
+// Watch replay offer after N fails
+let failCount = 0;
 
 dom.menuBtnLevelComplete?.addEventListener('click', () => {
   // go back to main menu from level complete overlay

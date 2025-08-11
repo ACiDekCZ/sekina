@@ -1,7 +1,7 @@
 // Embedded demo replays (author-provided), per level id
 const DEMO_REPLAYS = {
   
-  1: {"meta":{"seed":"2-L1","level":1,"when":1754921458409},"actions":[{"t":2.4166666666666607,"action":"down"},{"t":2.6333333333333266,"action":"up"},{"t":3.683333333333323,"action":"down"},{"t":3.983333333333322,"action":"up"},{"t":5.116666666666711,"action":"down"},{"t":5.333333333333388,"action":"up"},{"t":6.133333333333428,"action":"down"},{"t":6.266666666666768,"action":"up"},{"t":7.066666666666808,"action":"down"},{"t":7.200000000000148,"action":"up"},{"t":10.466666666666713,"action":"down"},{"t":10.800000000000027,"action":"up"},{"t":11.433333333333325,"action":"down"},{"t":11.583333333333316,"action":"up"},{"t":12.34999999999994,"action":"down"},{"t":12.49999999999993,"action":"up"},{"t":15.516666666666426,"action":"down"},{"t":15.749999999999746,"action":"up"},{"t":16.566666666666368,"action":"down"},{"t":16.766666666666357,"action":"up"},{"t":20.483333333332812,"action":"down"},{"t":20.633333333332804,"action":"up"},{"t":21.449999999999424,"action":"down"},{"t":21.69999999999941,"action":"up"},{"t":25.566666666665856,"action":"down"},{"t":26.01666666666583,"action":"up"},{"t":30.29999999999892,"action":"down"},{"t":30.516666666665575,"action":"up"},{"t":31.916666666665495,"action":"down"},{"t":32.083333333332156,"action":"up"},{"t":35.4166666666653,"action":"down"},{"t":35.633333333331954,"action":"up"},{"t":20.774999999999462,"action":"down"},{"t":20.908333333332788,"action":"up"},{"t":20.658333333332802,"action":"down"},{"t":20.774999999999462,"action":"up"},{"t":21.474999999999422,"action":"down"},{"t":21.691666666666077,"action":"up"},{"t":25.541666666665858,"action":"down"},{"t":25.774999999999178,"action":"up"},{"t":20.62499999999947,"action":"down"},{"t":20.74166666666613,"action":"up"},{"t":21.52499999999942,"action":"down"},{"t":21.8749999999994,"action":"up"},{"t":25.641666666665852,"action":"down"},{"t":25.92499999999917,"action":"up"},{"t":20.608333333332805,"action":"down"},{"t":20.758333333332796,"action":"up"},{"t":21.55833333333275,"action":"down"},{"t":21.741666666666074,"action":"up"},{"t":25.60833333333252,"action":"down"},{"t":25.791666666665844,"action":"up"},{"t":30.24166666666559,"action":"down"},{"t":30.958333333332217,"action":"up"},{"t":20.658333333332802,"action":"down"},{"t":20.758333333332796,"action":"up"},{"t":21.491666666666088,"action":"down"},{"t":21.8749999999994,"action":"up"},{"t":25.57499999999919,"action":"down"},{"t":26.024999999999164,"action":"up"},{"t":20.59166666666614,"action":"down"},{"t":20.74166666666613,"action":"up"},{"t":21.52499999999942,"action":"down"},{"t":21.741666666666074,"action":"up"},{"t":25.674999999999184,"action":"down"},{"t":25.9583333333325,"action":"up"},{"t":20.62499999999947,"action":"down"},{"t":20.724999999999465,"action":"up"},{"t":21.52499999999942,"action":"down"},{"t":21.824999999999402,"action":"up"},{"t":25.57499999999919,"action":"down"},{"t":25.824999999999175,"action":"up"},{"t":20.574999999999473,"action":"down"},{"t":20.691666666666134,"action":"up"},{"t":21.458333333332757,"action":"down"},{"t":21.924999999999397,"action":"up"},{"t":25.624999999999186,"action":"down"},{"t":25.791666666665844,"action":"up"},{"t":30.24166666666559,"action":"down"},{"t":31.108333333332208,"action":"up"},{"t":20.62499999999947,"action":"down"},{"t":20.74166666666613,"action":"up"},{"t":21.508333333332754,"action":"down"},{"t":21.924999999999397,"action":"up"},{"t":22.641666666666023,"action":"down"},{"t":22.89166666666601,"action":"up"},{"t":23.70833333333263,"action":"down"},{"t":23.89166666666595,"action":"up"},{"t":25.60833333333252,"action":"down"},{"t":26.141666666665824,"action":"up"},{"t":30.316666666665586,"action":"down"},{"t":31.241666666665534,"action":"up"},{"t":32.01666666666549,"action":"down"},{"t":20.191666666666162,"action":"up"},{"t":20.716666666666132,"action":"down"},{"t":20.79999999999946,"action":"up"},{"t":21.516666666666087,"action":"down"},{"t":21.741666666666074,"action":"up"},{"t":25.366666666665868,"action":"down"},{"t":25.474999999999195,"action":"up"},{"t":20.574999999999473,"action":"down"},{"t":20.699999999999466,"action":"up"},{"t":21.516666666666087,"action":"down"},{"t":21.774999999999405,"action":"up"},{"t":25.699999999999182,"action":"down"},{"t":26.21666666666582,"action":"up"},{"t":20.574999999999473,"action":"down"},{"t":20.7083333333328,"action":"up"},{"t":21.541666666666085,"action":"down"},{"t":21.75833333333274,"action":"up"},{"t":25.60833333333252,"action":"down"},{"t":25.858333333332506,"action":"up"},{"t":20.524999999999476,"action":"down"},{"t":20.658333333332802,"action":"up"},{"t":21.508333333332754,"action":"down"},{"t":21.858333333332734,"action":"up"},{"t":25.45833333333253,"action":"down"},{"t":26.441666666665807,"action":"up"},{"t":20.558333333332808,"action":"down"},{"t":20.7083333333328,"action":"up"},{"t":21.55833333333275,"action":"down"},{"t":21.808333333332737,"action":"up"},{"t":25.541666666665858,"action":"down"},{"t":26.341666666665812,"action":"up"},{"t":29.62499999999896,"action":"down"},{"t":30.508333333332242,"action":"up"},{"t":20.574999999999473,"action":"down"},{"t":20.7083333333328,"action":"up"},{"t":21.591666666666082,"action":"down"},{"t":21.774999999999405,"action":"up"},{"t":25.641666666665852,"action":"down"},{"t":26.15833333333249,"action":"up"},{"t":20.491666666666145,"action":"down"},{"t":20.641666666666136,"action":"up"},{"t":21.424999999999425,"action":"down"},{"t":21.8749999999994,"action":"up"},{"t":25.591666666665855,"action":"down"},{"t":26.04166666666583,"action":"up"},{"t":30.35833333333225,"action":"down"},{"t":30.6749999999989,"action":"up"},{"t":31.75833333333217,"action":"down"},{"t":32.00833333333216,"action":"up"},{"t":35.458333333331964,"action":"down"},{"t":35.85833333333194,"action":"up"},{"t":36.32499999999858,"action":"down"},{"t":36.741666666665225,"action":"up"},{"t":41.50833333333162,"action":"down"},{"t":41.89166666666493,"action":"up"},{"t":42.59166666666489,"action":"down"},{"t":43.17499999999819,"action":"up"},{"t":47.958333333331254,"action":"down"},{"t":48.574999999997885,"action":"up"},{"t":49.32499999999784,"action":"down"},{"t":49.60833333333116,"action":"up"},{"t":53.6249999999976,"action":"down"},{"t":54.12499999999757,"action":"up"},{"t":49.5166666666645,"action":"down"},{"t":49.36666666666451,"action":"up"},{"t":49.216666666664516,"action":"down"},{"t":49.43333333333117,"action":"up"},{"t":53.68333333333093,"action":"down"},{"t":54.11666666666424,"action":"up"},{"t":59.54999999999726,"action":"down"},{"t":59.86666666666391,"action":"up"},{"t":60.583333333330536,"action":"down"},{"t":60.79999999999719,"action":"up"},{"t":61.483333333330485,"action":"down"},{"t":61.833333333330465,"action":"up"}]}
+  1: {"meta":{"seed":"2-L1","level":1,"when":1754928105000},"actions":[{"t":2.366666666666661,"action":"down"},{"t":2.5166666666666604,"action":"up"},{"t":3.633333333333323,"action":"down"},{"t":3.899999999999989,"action":"up"},{"t":5.066666666666708,"action":"down"},{"t":5.566666666666733,"action":"up"},{"t":6.166666666666763,"action":"down"},{"t":6.31666666666677,"action":"up"},{"t":7.11666666666681,"action":"down"},{"t":7.25000000000015,"action":"up"},{"t":10.533333333333376,"action":"down"},{"t":10.716666666666699,"action":"up"},{"t":11.399999999999993,"action":"down"},{"t":11.599999999999982,"action":"up"},{"t":12.366666666666605,"action":"down"},{"t":12.49999999999993,"action":"up"},{"t":15.599999999999755,"action":"down"},{"t":15.73333333333308,"action":"up"},{"t":16.666666666666362,"action":"down"},{"t":16.824999999999687,"action":"up"},{"t":17.699999999999637,"action":"down"},{"t":17.833333333332963,"action":"up"},{"t":20.53333333333281,"action":"down"},{"t":20.699999999999466,"action":"up"},{"t":21.483333333332755,"action":"down"},{"t":21.683333333332744,"action":"up"},{"t":25.63333333333252,"action":"down"},{"t":25.86666666666584,"action":"up"},{"t":25.558333333332524,"action":"down"},{"t":26.241666666665818,"action":"up"},{"t":25.624999999999186,"action":"down"},{"t":25.80833333333251,"action":"up"},{"t":30.374999999998916,"action":"down"},{"t":30.624999999998902,"action":"up"},{"t":31.8416666666655,"action":"down"},{"t":32.00833333333216,"action":"up"},{"t":35.32499999999864,"action":"down"},{"t":35.491666666665296,"action":"up"},{"t":36.391666666665245,"action":"down"},{"t":37.358333333331856,"action":"up"},{"t":35.50833333333196,"action":"down"},{"t":35.62499999999862,"action":"up"},{"t":36.22499999999859,"action":"down"},{"t":36.391666666665245,"action":"up"},{"t":35.4416666666653,"action":"down"},{"t":35.54166666666529,"action":"up"},{"t":36.158333333331925,"action":"down"},{"t":36.274999999998585,"action":"up"},{"t":37.208333333331865,"action":"down"},{"t":37.358333333331856,"action":"up"},{"t":35.35833333333197,"action":"down"},{"t":35.47499999999863,"action":"up"},{"t":36.09166666666526,"action":"down"},{"t":36.191666666665256,"action":"up"},{"t":37.124999999998536,"action":"down"},{"t":37.25833333333186,"action":"up"},{"t":41.55833333333162,"action":"down"},{"t":41.89166666666493,"action":"up"},{"t":42.658333333331555,"action":"down"},{"t":42.891666666664875,"action":"up"},{"t":48.00833333333125,"action":"down"},{"t":48.60833333333122,"action":"up"},{"t":47.991666666664585,"action":"down"},{"t":48.82499999999787,"action":"up"},{"t":49.30833333333118,"action":"down"},{"t":49.508333333331166,"action":"up"},{"t":53.65833333333093,"action":"down"},{"t":53.84166666666425,"action":"up"},{"t":53.699999999997594,"action":"down"},{"t":54.2333333333309,"action":"up"},{"t":59.31666666666394,"action":"down"},{"t":59.999999999997236,"action":"up"},{"t":60.24999999999722,"action":"down"},{"t":60.44999999999721,"action":"up"}]}
 };
 
 
@@ -30,6 +30,8 @@ const CONFIG = {
 
 // Fixed-step for deterministic replay
 const FIXED_DT = 1 / 120; // 120 Hz
+
+function dbg(...args) { if (DEBUG) try { console.log('[DBG]', ...args); } catch {} }
 
 // Debug mode: allow selecting seed and level on the title screen
 // Enabled via URL parameter ?debug=1|true|on (or ?debug with no value)
@@ -427,9 +429,9 @@ function createInputs(target) {
   // listen on window so taps anywhere trigger jump on mobile
   window.addEventListener('pointerdown', start, { passive: false });
   window.addEventListener('pointerup', end);
-  window.addEventListener('keydown', (e) => { if ((e.code === 'Space' || e.code === 'ArrowUp') && !e.repeat) { if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; if (DEBUG) { (state.autoRecording ||= []).push({ t: world.time, action: 'down' }); } hint(false);} });
+  window.addEventListener('keydown', (e) => { if ((e.code === 'Space' || e.code === 'ArrowUp') && !e.repeat) { if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; if (DEBUG) { (state.autoRecording ||= []).push({ t: world.time, k: world.tick||0, action: 'down' }); } hint(false);} });
   window.addEventListener('keydown', (e) => { if (e.code === 'KeyH') state.debugHitbox = !state.debugHitbox; });
-  window.addEventListener('keyup', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') { pressed.jump = false; if (DEBUG) { (state.autoRecording ||= []).push({ t: world.time, action: 'up' }); } } });
+  window.addEventListener('keyup', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') { pressed.jump = false; if (DEBUG) { (state.autoRecording ||= []).push({ t: world.time, k: world.tick||0, action: 'up' }); } } });
 // Rewind to previous autosave in autoplay (debug)
 window.addEventListener('keydown', (e) => {
   if (!DEBUG) return;
@@ -482,7 +484,7 @@ function createWorld() {
     spawnCursorX: 0,
     nextSectionIndex: 0,
     plannedSections: [],
-    sections: [], // spawned section boundaries { index, startX, endX }
+    sections: [], // spawned section boundaries { index, startWX, endWX }
     stopSpawning: false,
     timeUp: false,
     finalSectionEndX: null,
@@ -491,11 +493,12 @@ function createWorld() {
     currentSectionIdx: -1,
     lastSectionSnapshot: null,
     lastGapSnapshot: null,
-    lastGapMidX: null,
-    pendingGapMidX: null,
+    lastGapMidWX: null,
+    pendingGapMidWX: null,
     gapSnapshots: [],
     levelTimeLeft: LEVEL_DURATION_SEC,
-    levelElapsed: 0
+    levelElapsed: 0,
+    tick: 0
   };
 }
 
@@ -616,6 +619,7 @@ function startLevel(levelNumber) {
     state.autoPlan = null;
     state.autoRecording = [];
     state.overrideBaseSeed = state.overrideBaseSeed || undefined;
+    state.recordStartTick = world.tick || 0;
     // start paused or running based on checkbox? keep running
   }
 }
@@ -629,6 +633,7 @@ function captureSnapshot() {
     levelTimeLeft: world.levelTimeLeft,
     levelElapsed: world.levelElapsed,
     power: { ...(state.power || {}) },
+    tick: world.tick || 0,
     player: { ...world.player },
     obstacles: world.obstacles.map(o => ({ ...o })),
     platforms: world.platforms.map(p => ({ ...p })),
@@ -650,6 +655,12 @@ function restoreSnapshot(s) {
   if (typeof s.levelTimeLeft === 'number') world.levelTimeLeft = s.levelTimeLeft;
   if (typeof s.levelElapsed === 'number') world.levelElapsed = s.levelElapsed;
   if (s.power) state.power = { ...s.power };
+  if (typeof s.tick === 'number') world.tick = s.tick;
+  // clear any pending replay injections
+  state._injectDown = false;
+  state._injectUp = false;
+  state._replayHolding = false;
+  state._replayJust = false;
   world.player = { ...s.player };
   world.obstacles = s.obstacles.map(o => ({ ...o }));
   world.platforms = s.platforms.map(p => ({ ...p }));
@@ -663,6 +674,11 @@ function restoreSnapshot(s) {
   // If we annotated a desired world distance override, use it
   if (typeof s.distanceOverride === 'number') {
     world.distance = Math.max(0, s.distanceOverride);
+  }
+  // If recording debug actions, trim any recorded actions beyond restored tick
+  if (DEBUG && Array.isArray(state.autoRecording) && state.autoRecording.length) {
+    const t = world.tick || 0;
+    state.autoRecording = state.autoRecording.filter(a => (typeof a.k === 'number' ? a.k <= t : true));
   }
 }
 
@@ -1011,19 +1027,21 @@ function spawnNext() {
   for (const o of newTop) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
   for (const s of newSaws) { const w = (s.r || 0) * 2; firstX = Math.min(firstX, s.x - w/2); lastX = Math.max(lastX, s.x + w/2); }
   // record section boundaries in world space
-  const startX = isFinite(firstX) ? firstX : base;
-  const endX = isFinite(lastX) ? lastX : (base + sec.length);
-  world.sections.push({ index, startX, endX });
+  const startWX = isFinite(firstX) ? firstX : base;
+  const endWX = isFinite(lastX) ? lastX : (base + sec.length);
+  world.sections.push({ index, startWX, endWX });
+  dbg('SECTION', index, { startWX, endWX, base, length: sec.length });
   world.nextSectionIndex += 1;
   if (DEBUG) {
     world.currentSectionIdx = index;
     // set pending gap between previous section end and current section start (real positions)
     const prevSection = world.sections[world.sections.length - 2];
     if (prevSection && isFinite(firstX)) {
-      const gapMid = Math.floor((prevSection.endX + startX) / 2);
+      const gapMid = (prevSection.endWX + startWX) / 2;
       const playerWorldX = world.distance + world.player.x;
-      if (world.pendingGapMidX == null && gapMid > playerWorldX + 20) {
-        world.pendingGapMidX = gapMid;
+      if (world.pendingGapMidWX == null && gapMid > playerWorldX + 20) {
+        world.pendingGapMidWX = gapMid;
+        dbg('PENDING_GAP', { prevEnd: prevSection.endWX, nextStart: startWX, gapMid });
       }
     }
   }
@@ -1042,10 +1060,11 @@ function update(dt) {
 
   // jump
   // Apply replay injections (down/up) into inputs
-  if (state._injectDown) { state._injectDown = false; state._replayHolding = true; state._replayJust = true; }
+  if (state._injectDown) { state._replayHolding = true; state._replayJust = true; }
   if (state._injectUp) { state._injectUp = false; state._replayHolding = false; }
-  let pressedNow = inputs.consumePress() || !!state._replayJust;
+  let pressedNow = inputs.consumePress() || !!state._replayJust || (!!state.replay && state._injectDown);
   state._replayJust = false;
+  state._injectDown = false;
   // Debug autoplay now does not auto-press; it only records (handled in input) and rewinds on fail
   if (player.onGround && pressedNow) {
     player.onGround = false;
@@ -1102,17 +1121,18 @@ function update(dt) {
     }
   }
 
-  // If we have a pending gap midpoint and player prošel za něj, potvrď gap snapshot
-  if (DEBUG && typeof world.pendingGapMidX === 'number') {
+  // If we have a pending gap midpoint (world-space) and player prošel za něj, potvrď gap snapshot
+  if (DEBUG && typeof world.pendingGapMidWX === 'number') {
     const playerWorldX = world.distance + world.player.x;
-    if (playerWorldX > world.pendingGapMidX) {
+    if (playerWorldX > world.pendingGapMidWX) {
       const gapSnap = captureSnapshot();
-      // align snapshot so that on restore jsme uprostřed gapu
-      gapSnap.distanceOverride = Math.max(0, world.pendingGapMidX - world.player.x);
+      // align on restore do středu gapu: distanceOverride = gapMid - player.x
+      gapSnap.distanceOverride = Math.max(0, world.pendingGapMidWX - world.player.x);
       world.lastGapSnapshot = gapSnap;
-      world.lastGapMidX = world.pendingGapMidX;
+      world.lastGapMidWX = world.pendingGapMidWX;
       world.gapSnapshots.push(gapSnap);
-      world.pendingGapMidX = null;
+      world.pendingGapMidWX = null;
+      dbg('CONFIRM_GAP', { lastGapMidWX: world.lastGapMidWX });
     }
   }
 
@@ -1125,14 +1145,14 @@ function update(dt) {
     let current = null;
     for (let i = 0; i < world.sections.length; i++) {
       const s = world.sections[i];
-      if (playerWorldX >= s.startX && playerWorldX < s.endX) { current = s; break; }
+      if (playerWorldX >= s.startWX && playerWorldX < s.endWX) { current = s; break; }
     }
     // fallback: if not found (e.g., early), take the last spawned section
     const selected = current || world.sections[world.sections.length - 1];
     if (selected) {
       // finish point is midway through the QUIET gap after this section
-      world.finalSectionEndX = selected.endX;
-      world.finishX = selected.endX + Math.max(80, CONFIG.startGapPx * 0.5);
+      world.finalSectionEndX = selected.endWX;
+      world.finishX = selected.endWX + Math.max(80, CONFIG.startGapPx * 0.5);
     } else {
       // if nothing spawned yet, complete immediately
       world.finalSectionEndX = world.distance + 1;
@@ -1364,9 +1384,8 @@ function drawBackground(ctx) {
   ctx.restore();
 
   // Debug: draw marker for last gap snapshot (where rewind returns)
-  if (DEBUG && dom.autoplay?.checked && world.lastGapSnapshot && typeof world.lastGapSnapshot.distanceOverride === 'number') {
-    const markerWorldX = world.lastGapSnapshot.distanceOverride + world.player.x;
-    const screenX = markerWorldX - world.distance;
+  if (DEBUG && typeof world.lastGapMidWX === 'number') {
+    const screenX = world.lastGapMidWX - world.distance;
     if (screenX > -40 && screenX < viewport.width + 40) {
       ctx.save();
       ctx.globalAlpha = 0.9;
@@ -1420,8 +1439,8 @@ function drawDebugSections(ctx) {
     }
   }
   // Draw gap midpoints
-  if (typeof world.lastGapMidX === 'number') {
-    const gx = world.lastGapMidX - world.distance;
+  if (typeof world.lastGapMidWX === 'number') {
+    const gx = world.lastGapMidWX - world.distance;
     if (gx > -pad && gx < viewport.width + pad) {
       ctx.strokeStyle = '#22d3ee';
       ctx.setLineDash([4, 4]);
@@ -1433,8 +1452,8 @@ function drawDebugSections(ctx) {
       ctx.fillText('GAP', Math.floor(gx) + 4, 36);
     }
   }
-  if (typeof world.pendingGapMidX === 'number') {
-    const gx = world.pendingGapMidX - world.distance;
+  if (typeof world.pendingGapMidWX === 'number') {
+    const gx = world.pendingGapMidWX - world.distance;
     if (gx > -pad && gx < viewport.width + pad) {
       ctx.strokeStyle = '#f59e0b';
       ctx.setLineDash([2, 6]);
@@ -1684,18 +1703,26 @@ function draw(timestamp) {
     while (state._accum >= FIXED_DT) {
       state._accum -= FIXED_DT;
       // If playing a replay, inject down/up events precisely aligned to world.time
-      if (state.replay && state.replay.actions) {
-        const tRel = world.time - (state.replayStartTime || 0);
-        while (true) {
-          const idx = state.replayPtr || 0;
-          const next = state.replay.actions[idx];
-          if (!next || tRel < (next.t || 0)) break;
-          if (next.action === 'down') state._injectDown = true;
-          else if (next.action === 'up') state._injectUp = true;
-          state.replayPtr = idx + 1;
+    if (state.replay && state.replay.actions) {
+      const currentTick = world.tick || 0;
+      while (true) {
+        const idx = state.replayPtr || 0;
+        const next = state.replay.actions[idx];
+        if (!next) break;
+        const targetTick = (typeof next.k === 'number') ? next.k : null;
+        if (targetTick != null) {
+          if (currentTick < targetTick) break;
+        } else {
+          const tRel = world.time - (state.replayStartTime || 0);
+          if (tRel < (next.t || 0)) break;
         }
+        if (next.action === 'down') state._injectDown = true;
+        else if (next.action === 'up') state._injectUp = true;
+        state.replayPtr = idx + 1;
       }
+    }
       update(FIXED_DT);
+      world.tick += 1;
     }
   }
   drawPlatforms(ctx);

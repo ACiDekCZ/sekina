@@ -427,6 +427,20 @@ function createInputs(target) {
   window.addEventListener('keydown', (e) => { if ((e.code === 'Space' || e.code === 'ArrowUp') && !e.repeat) { if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; if (DEBUG && dom.autoplay?.checked) { (state.autoRecording ||= []).push({ t: world.time, action: 'down' }); } hint(false);} });
   window.addEventListener('keydown', (e) => { if (e.code === 'KeyH') state.debugHitbox = !state.debugHitbox; });
   window.addEventListener('keyup', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') { pressed.jump = false; if (DEBUG && dom.autoplay?.checked) { (state.autoRecording ||= []).push({ t: world.time, action: 'up' }); } } });
+// Rewind to previous autosave in autoplay (debug)
+window.addEventListener('keydown', (e) => {
+  if (!DEBUG || !dom.autoplay?.checked) return;
+  if (e.code === 'KeyR') {
+    e.preventDefault();
+    // pop last gap snapshot and restore previous one
+    if (world.gapSnapshots && world.gapSnapshots.length >= 2) {
+      world.gapSnapshots.pop();
+      const prev = world.gapSnapshots[world.gapSnapshots.length - 1];
+      restoreSnapshot(prev);
+      state.uiToasts.push({ id: Math.random(), text: 'Rewind prev', born: world.time, dur: 0.8 });
+    }
+  }
+});
   return {
     isJumping: () => pressed.jump,
     consumePress: () => { const was = pressed.justPressed; pressed.justPressed = false; return was; }
@@ -468,6 +482,7 @@ function createWorld() {
     lastGapSnapshot: null,
     lastGapMidX: null,
     pendingGapMidX: null,
+    gapSnapshots: [],
     levelTimeLeft: LEVEL_DURATION_SEC,
     levelElapsed: 0
   };
@@ -890,13 +905,24 @@ function spawnSection(section) {
   if (DEBUG) {
     world.lastSectionSnapshot = captureSnapshot();
     // Prepare pending gap midpoint for the nearest upcoming section only
-    const prev = world.sections[world.sections.length - 1];
-    const prevEnd = prev ? prev.endX : 0;
-    const gapStart = prevEnd;
-    const gapEnd = base;
-    const gapMid = Math.floor((gapStart + gapEnd) / 2);
+    // Determine gap midpoint by last spike of previous section and first spike of this section
+    const prevSection = world.sections[world.sections.length - 1];
+    let prevSpikeX = prevSection ? prevSection.endX : 0;
+    let firstSpikeX = base + 200; // fallback
+    // scan current section items for first spike
+    for (const it of section.items) {
+      if (it.t === 'spike' || it.t === 'topSpike' || it.t === 'block') {
+        const x = base + (it.dx || 0);
+        if (x < firstSpikeX) firstSpikeX = x;
+      }
+    }
+    // scan previous section spikes if possible from recorded bounds
+    if (prevSection) {
+      prevSpikeX = prevSection.endX;
+    }
+    const gapMid = Math.floor((prevSpikeX + firstSpikeX) / 2);
     const playerWorldX = world.distance + world.player.x;
-    if (world.pendingGapMidX == null && gapMid > playerWorldX + 20) {
+    if (world.pendingGapMidX == null && gapMid > playerWorldX + 20 && prevSection) {
       world.pendingGapMidX = gapMid;
     }
   }
@@ -1046,6 +1072,7 @@ function update(dt) {
       gapSnap.distanceOverride = Math.max(0, world.pendingGapMidX - world.player.x);
       world.lastGapSnapshot = gapSnap;
       world.lastGapMidX = world.pendingGapMidX;
+      world.gapSnapshots.push(gapSnap);
       world.pendingGapMidX = null;
     }
   }
@@ -1316,6 +1343,73 @@ function drawBackground(ctx) {
   }
 }
 
+function drawDebugSections(ctx) {
+  if (!DEBUG) return;
+  const pad = 40;
+  const leftWorld = world.distance - pad;
+  const rightWorld = world.distance + viewport.width + pad;
+  ctx.save();
+  ctx.lineWidth = 2;
+  ctx.font = '10px system-ui, sans-serif';
+  ctx.textAlign = 'left';
+  // Draw section boundaries
+  for (const s of world.sections) {
+    if (!s) continue;
+    // start line (green)
+    if (s.startX >= leftWorld && s.startX <= rightWorld) {
+      const x = Math.floor(s.startX - world.distance);
+      ctx.strokeStyle = '#22c55e';
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, viewport.groundY);
+      ctx.stroke();
+      ctx.fillStyle = '#22c55e';
+      ctx.fillText(`S${s.index}`, x + 4, 12);
+    }
+    // end line (red)
+    if (s.endX >= leftWorld && s.endX <= rightWorld) {
+      const x = Math.floor(s.endX - world.distance);
+      ctx.strokeStyle = '#ef4444';
+      ctx.setLineDash([8, 6]);
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, viewport.groundY);
+      ctx.stroke();
+      ctx.fillStyle = '#ef4444';
+      ctx.fillText(`E${s.index}`, x + 4, 24);
+    }
+  }
+  // Draw gap midpoints
+  if (typeof world.lastGapMidX === 'number') {
+    const gx = world.lastGapMidX - world.distance;
+    if (gx > -pad && gx < viewport.width + pad) {
+      ctx.strokeStyle = '#22d3ee';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      ctx.moveTo(Math.floor(gx), 0);
+      ctx.lineTo(Math.floor(gx), viewport.groundY);
+      ctx.stroke();
+      ctx.fillStyle = '#22d3ee';
+      ctx.fillText('GAP', Math.floor(gx) + 4, 36);
+    }
+  }
+  if (typeof world.pendingGapMidX === 'number') {
+    const gx = world.pendingGapMidX - world.distance;
+    if (gx > -pad && gx < viewport.width + pad) {
+      ctx.strokeStyle = '#f59e0b';
+      ctx.setLineDash([2, 6]);
+      ctx.beginPath();
+      ctx.moveTo(Math.floor(gx), 0);
+      ctx.lineTo(Math.floor(gx), viewport.groundY);
+      ctx.stroke();
+      ctx.fillStyle = '#f59e0b';
+      ctx.fillText('PENDING', Math.floor(gx) + 4, 48);
+    }
+  }
+  ctx.restore();
+}
+
 function drawPlayer(ctx) {
   const p = world.player;
   const bob = Math.sin(world.time * 20) * (p.onGround ? 2 : 4);
@@ -1564,6 +1658,7 @@ function draw(timestamp) {
   drawObstacles(ctx);
   drawCoins(ctx);
   drawBonuses(ctx);
+  drawDebugSections(ctx);
   drawPowerups(ctx);
   // toasts (top-center, subtle)
   if (state.uiToasts && state.uiToasts.length) {
@@ -1641,12 +1736,7 @@ dom.play?.addEventListener('click', () => {
 
 dom.retry?.addEventListener('click', () => startGame());
 
-// Pause autoplay (debug)
-document.getElementById('pause-autoplay')?.addEventListener('click', () => {
-  if (!DEBUG) return;
-  state.running = !state.running;
-  (state.uiToasts ||= []).push({ id: Math.random(), text: state.running ? 'Resume' : 'Paused', born: world.time, dur: 0.8 });
-});
+// Removed pause autoplay UI
 
 // Show hint (play embedded demo replay)
 dom.showHint?.addEventListener('click', () => {
@@ -1730,13 +1820,11 @@ window.addEventListener('load', () => {
     seedRow?.classList.add('hidden');
     levelRow?.classList.add('hidden');
     autoplayRow?.classList.add('hidden');
-    document.getElementById('rewind-row')?.classList.add('hidden');
     dom.stopReplay?.classList.add('hidden');
   } else {
     seedRow?.classList.remove('hidden');
     levelRow?.classList.remove('hidden');
     autoplayRow?.classList.remove('hidden');
-    document.getElementById('rewind-row')?.classList.remove('hidden');
     // stop replay button only if autoplay debug is visible
     dom.stopReplay?.classList.add('hidden');
   }

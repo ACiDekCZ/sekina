@@ -36,6 +36,7 @@
   .overlay.visible { opacity: 1; pointer-events: auto; }
   .overlay h1, .overlay h2 { margin: 0 0 4px; }
   .controls { display: inline-flex; gap: 12px; }
+  #rewind-row { justify-content: center; }
   .levels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin-top: 12px; width: min(90vw, 520px); }
   .level-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px; border-radius: 12px; background: #1a1f2b; color: #fff; border: 1px solid #ffffff20; box-shadow: var(--shadow); min-height: 56px; text-align: center; }
   .level-btn .title { font-weight: 700; font-size: 12px; letter-spacing: .2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 92%; }

@@ -8,6 +8,8 @@ const CONFIG = {
   player: { x: 120, width: 84, height: 56 },
   speed: 320, // start speed px/s
   speedGain: 0.22, // per second
+  startGapPx: 420, // fixed gap before first section (device-independent)
+  spawnAheadPx: 1600, // how far ahead to keep spawning (device-independent)
   // Pointy obstacles (spikes)
   obstacle: { minGap: 320, maxGap: 520, minWidth: 28, maxWidth: 46, minHeight: 40, maxHeight: 100 },
   // Platforms you can land on (always reachable)
@@ -444,6 +446,8 @@ function createWorld() {
     timeUp: false,
     finalSectionEndX: null,
     finishX: null,
+    // rewind support (debug): last safe snapshot
+    lastSafe: null,
     levelTimeLeft: LEVEL_DURATION_SEC,
     levelElapsed: 0
   };
@@ -548,13 +552,15 @@ function startLevel(levelNumber) {
   world.timeUp = false;
   world.finalSectionEndX = null;
   world.finishX = null;
-  world.spawnCursorX = viewport.width + 200; // start ahead of player
+  world.spawnCursorX = CONFIG.startGapPx + viewport.width * 0; // device-independent fixed start gap
   // refresh level select UI (HS, lock states)
   refreshLevelSelect();
   // autoplay recording reset in debug
   if (DEBUG && dom.autoplay?.checked) {
     state.autoPlan = null;
     state.autoRecording = [];
+    state.overrideBaseSeed = state.overrideBaseSeed || undefined;
+    // start paused or running based on checkbox? keep running
   }
 }
 
@@ -858,6 +864,10 @@ function spawnSection(section) {
     }
   }
   world.spawnCursorX += section.length;
+  // record snapshot at the boundary for rewind (debug)
+  if (DEBUG) {
+    world.lastSafe = captureSnapshot();
+  }
 }
 
 function spawnNext() {
@@ -869,6 +879,9 @@ function spawnNext() {
   // record section boundaries in world space
   world.sections.push({ index, startX: base, endX: base + sec.length });
   world.nextSectionIndex += 1;
+  if (DEBUG) {
+    world.lastSafe = captureSnapshot();
+  }
 }
 
 function update(dt) {
@@ -1010,7 +1023,7 @@ function update(dt) {
 
   // spawn next sections ahead so there is always something to run
   if (!world.stopSpawning) {
-    while ((getLastSpawnX() - world.distance) < (viewport.width + 1200)) {
+    while ((getLastSpawnX() - world.distance) < (CONFIG.spawnAheadPx)) {
       spawnNext();
     }
   }
@@ -1078,9 +1091,15 @@ function update(dt) {
         state.power.invulnUntil = world.time + 0.8;
         if (state.audioOn) sounds.hit(260, 0.06);
       } else {
-        if (state.audioOn) sounds.hit(200, 0.08);
-        endGame();
-        return;
+        if (DEBUG && dom.autoplay?.checked && world.lastSafe) {
+          restoreSnapshot(world.lastSafe);
+          state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
+          return; // resume from snapshot
+        } else {
+          if (state.audioOn) sounds.hit(200, 0.08);
+          endGame();
+          return;
+        }
       }
     }
     if (!o.passed && o.x + o.width < player.x) {
@@ -1104,9 +1123,15 @@ function update(dt) {
           state.power.invulnUntil = world.time + 0.8;
           if (state.audioOn) sounds.hit(260, 0.06);
         } else {
-          if (state.audioOn) sounds.hit(200, 0.08);
-          endGame();
-          return;
+          if (DEBUG && dom.autoplay?.checked && world.lastSafe) {
+            restoreSnapshot(world.lastSafe);
+            state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
+            return;
+          } else {
+            if (state.audioOn) sounds.hit(200, 0.08);
+            endGame();
+            return;
+          }
         }
       }
     }
@@ -1125,9 +1150,15 @@ function update(dt) {
         state.power.invulnUntil = world.time + 0.8;
         if (state.audioOn) sounds.hit(260, 0.06);
       } else {
-        if (state.audioOn) sounds.hit(200, 0.08);
-        endGame();
-        return;
+        if (DEBUG && dom.autoplay?.checked && world.lastSafe) {
+          restoreSnapshot(world.lastSafe);
+          state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
+          return;
+        } else {
+          if (state.audioOn) sounds.hit(200, 0.08);
+          endGame();
+          return;
+        }
       }
     }
   }
@@ -1555,6 +1586,13 @@ dom.play?.addEventListener('click', () => {
 
 dom.retry?.addEventListener('click', () => startGame());
 
+// Pause autoplay (debug)
+document.getElementById('pause-autoplay')?.addEventListener('click', () => {
+  if (!DEBUG) return;
+  state.running = !state.running;
+  (state.uiToasts ||= []).push({ id: Math.random(), text: state.running ? 'Resume' : 'Paused', born: world.time, dur: 0.8 });
+});
+
 dom.menuBtn?.addEventListener('click', () => {
   // go back to main menu from game over
   state.running = false;
@@ -1601,10 +1639,12 @@ window.addEventListener('load', () => {
     seedRow?.classList.add('hidden');
     levelRow?.classList.add('hidden');
     autoplayRow?.classList.add('hidden');
+    document.getElementById('rewind-row')?.classList.add('hidden');
   } else {
     seedRow?.classList.remove('hidden');
     levelRow?.classList.remove('hidden');
     autoplayRow?.classList.remove('hidden');
+    document.getElementById('rewind-row')?.classList.remove('hidden');
   }
 });
 

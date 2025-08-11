@@ -1,3 +1,21 @@
+// Embedded demo replays (author-provided), per level id
+const DEMO_REPLAYS = {
+  1: {
+    meta: { seed: 'L1-default-L1' },
+    actions: [
+      { t: 0.30, action: 'press' },
+      { t: 0.86, action: 'press' },
+      { t: 1.42, action: 'press' },
+      { t: 1.98, action: 'press' },
+      { t: 2.54, action: 'press' },
+      { t: 3.10, action: 'press' },
+      { t: 3.66, action: 'press' }
+    ]
+  }
+};
+
+function hasEmbeddedDemo(levelId){ return !!DEMO_REPLAYS[levelId]; }
+function getEmbeddedDemo(levelId){ return DEMO_REPLAYS[levelId]; }
 // Sekina Dash – minimalist runner inspired by Geometry Dash
 
 const CONFIG = {
@@ -82,7 +100,7 @@ const dom = {
   seedInput: document.getElementById('seed'),
   autoplay: document.getElementById('autoplay'),
   copyReplay: document.getElementById('copy-replay'),
-  watchReplay: document.getElementById('watch-replay'),
+  showHint: document.getElementById('show-hint'),
   stopReplay: document.getElementById('stop-replay'),
   levels: document.getElementById('levels'),
   score: document.getElementById('score'),
@@ -496,11 +514,10 @@ function endGame() {
   dom.finalBest.textContent = state.best.toString();
   dom.gameover.classList.add('visible');
   shake();
-  // watch replay offer after 5 fails if replay exists
+  // Show hint (demo) after 5 fails if embedded demo exists
   failCount += 1;
-  const key = `sekina_replay_L${state.level || 1}`;
-  if (failCount >= 5 && localStorage.getItem(key)) {
-    dom.watchReplay?.classList.remove('hidden');
+  if (failCount >= 5 && hasEmbeddedDemo(state.level || 1)) {
+    dom.showHint?.classList.remove('hidden');
   }
   // In debug autoplay, automatically retry the same level/seed until success
   if (DEBUG && dom.autoplay?.checked) {
@@ -887,15 +904,16 @@ function spawnSection(section) {
   // When a new section is about to spawn, capture a snapshot BEFORE its obstacles appear
   if (DEBUG) {
     world.lastSectionSnapshot = captureSnapshot();
-    // Also capture the gap snapshot a bit before the start (middle of gap):
-    // we compute the midpoint between previous end and new section start.
+    // Prepare pending gap midpoint for the nearest upcoming section only
     const prev = world.sections[world.sections.length - 1];
     const prevEnd = prev ? prev.endX : 0;
     const gapStart = prevEnd;
     const gapEnd = base;
     const gapMid = Math.floor((gapStart + gapEnd) / 2);
-    // Defer saving the gap snapshot until player skutečně projde přes gapMid (bude vidět za ním)
-    world.pendingGapMidX = gapMid;
+    const playerWorldX = world.distance + world.player.x;
+    if (world.pendingGapMidX == null && gapMid > playerWorldX + 20) {
+      world.pendingGapMidX = gapMid;
+    }
   }
   const sectionPlatforms = section.items
     .filter(it => it.t === 'platform')
@@ -1196,7 +1214,7 @@ function update(dt) {
     if (aabb(pb, hb) && !b.taken) {
       b.taken = true;
       if (b.type === 'shield') {
-        state.power.shieldHits = Math.min(1, (state.power.shieldHits || 0) + 1);
+        state.power.shieldHits = (state.power.shieldHits || 0) + 1;
       } else if (b.type === 'double') {
         state.power.doubleJumpUntil = world.time + 9; // 9s double jump
         state.power.doubleJumpTotal = 9;
@@ -1641,22 +1659,18 @@ document.getElementById('pause-autoplay')?.addEventListener('click', () => {
   (state.uiToasts ||= []).push({ id: Math.random(), text: state.running ? 'Resume' : 'Paused', born: world.time, dur: 0.8 });
 });
 
-// Watch replay handler
-dom.watchReplay?.addEventListener('click', () => {
-  const key = `sekina_replay_L${state.level || 1}`;
-  const val = localStorage.getItem(key);
-  if (!val) return;
-  try {
-    const replay = JSON.parse(val);
-    startLevel(state.level || 1);
-    // attach replay to state
-    state.replay = replay;
-    state.replayPtr = 0;
-    state.replayStartTime = world.time;
-    state.running = true;
-    dom.gameover.classList.remove('visible');
-    dom.stopReplay?.classList.remove('hidden');
-  } catch {}
+// Show hint (play embedded demo replay)
+dom.showHint?.addEventListener('click', () => {
+  const lvl = state.level || 1;
+  const demo = getEmbeddedDemo(lvl);
+  if (!demo) return;
+  startLevel(lvl);
+  state.replay = demo;
+  state.replayPtr = 0;
+  state.replayStartTime = world.time;
+  state.running = true;
+  dom.gameover.classList.remove('visible');
+  dom.stopReplay?.classList.remove('hidden');
 });
 
 dom.stopReplay?.addEventListener('click', () => {

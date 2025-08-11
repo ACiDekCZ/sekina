@@ -525,7 +525,7 @@ function endGame() {
   // highscore per-level
   const totalEnd = estimateLevelDistanceWithPlanPx(state.level || 1);
   const ratioEnd = totalEnd > 0 ? Math.max(0, Math.min(1, (world.distance + (world.player?.x || 0)) / totalEnd)) : 0;
-  if (!(DEBUG && dom.autoplay?.checked)) {
+  if (!DEBUG) {
     setHighscore(state.level || 1, state.score, ratioEnd);
   }
   state.best = Math.max(state.best, state.score);
@@ -584,8 +584,7 @@ function startLevel(levelNumber) {
       state.overrideBaseSeed = baseSeed;
     } else {
       baseSeed = PRESET_LEVEL_SEEDS[(chosenLevel - 1) % PRESET_LEVEL_SEEDS.length] || `L${chosenLevel}`;
-      // if autoplay is on, lock base seed for consistent retries
-      if (dom.autoplay?.checked) state.overrideBaseSeed = baseSeed;
+      state.overrideBaseSeed = baseSeed;
     }
   } else {
     baseSeed = PRESET_LEVEL_SEEDS[(chosenLevel - 1) % PRESET_LEVEL_SEEDS.length] || `L${chosenLevel}`;
@@ -612,8 +611,8 @@ function startLevel(levelNumber) {
   world.spawnCursorX = CONFIG.startGapPx + viewport.width * 0; // device-independent fixed start gap
   // refresh level select UI (HS, lock states)
   refreshLevelSelect();
-  // autoplay recording reset in debug
-  if (DEBUG && dom.autoplay?.checked) {
+  // recording reset in debug
+  if (DEBUG) {
     state.autoPlan = null;
     state.autoRecording = [];
     state.overrideBaseSeed = state.overrideBaseSeed || undefined;
@@ -671,13 +670,13 @@ function completeLevel() {
   // save per-level HS (score + furthest ratio) and unlock the next level
   const totalOk = estimateLevelDistanceWithPlanPx(state.level || 1);
   const ratioOk = totalOk > 0 ? Math.max(0, Math.min(1, (world.distance + (world.player?.x || 0)) / totalOk)) : 0;
-  if (!(DEBUG && dom.autoplay?.checked)) {
+  if (!DEBUG) {
     setHighscore(state.level || 1, state.levelScore || 0, ratioOk);
   }
   setUnlocked(state.level || 1);
   refreshLevelSelect();
   // Save successful autoplay replay for this level/seed (debug)
-  if (DEBUG && dom.autoplay?.checked && Array.isArray(state.autoRecording) && state.autoRecording.length > 0) {
+  if (DEBUG && Array.isArray(state.autoRecording) && state.autoRecording.length > 0) {
     try {
       const key = `sekina_replay_L${state.level}`;
       const meta = { seed: world.seedStr, level: state.level, when: Date.now() };
@@ -931,31 +930,7 @@ function getLastSpawnX() {
 function spawnSection(section) {
   const base = world.spawnCursorX;
   const spawned = [];
-  // When a new section is about to spawn, capture a snapshot BEFORE its obstacles appear
-  if (DEBUG) {
-    world.lastSectionSnapshot = captureSnapshot();
-    // Prepare pending gap midpoint for the nearest upcoming section only
-    // Determine gap midpoint by last spike of previous section and first spike of this section
-    const prevSection = world.sections[world.sections.length - 1];
-    let prevSpikeX = prevSection ? prevSection.endX : 0;
-    let firstSpikeX = base + 200; // fallback
-    // scan current section items for first spike
-    for (const it of section.items) {
-      if (it.t === 'spike' || it.t === 'topSpike' || it.t === 'block') {
-        const x = base + (it.dx || 0);
-        if (x < firstSpikeX) firstSpikeX = x;
-      }
-    }
-    // scan previous section spikes if possible from recorded bounds
-    if (prevSection) {
-      prevSpikeX = prevSection.endX;
-    }
-    const gapMid = Math.floor((prevSpikeX + firstSpikeX) / 2);
-    const playerWorldX = world.distance + world.player.x;
-    if (world.pendingGapMidX == null && gapMid > playerWorldX + 20 && prevSection) {
-      world.pendingGapMidX = gapMid;
-    }
-  }
+  // When a new section spawns, we no longer precompute pending gap here
   const sectionPlatforms = section.items
     .filter(it => it.t === 'platform')
     .map(it => ({
@@ -1042,6 +1017,15 @@ function spawnNext() {
   world.nextSectionIndex += 1;
   if (DEBUG) {
     world.currentSectionIdx = index;
+    // set pending gap between previous section end and current section start (real positions)
+    const prevSection = world.sections[world.sections.length - 2];
+    if (prevSection && isFinite(firstX)) {
+      const gapMid = Math.floor((prevSection.endX + startX) / 2);
+      const playerWorldX = world.distance + world.player.x;
+      if (world.pendingGapMidX == null && gapMid > playerWorldX + 20) {
+        world.pendingGapMidX = gapMid;
+      }
+    }
   }
 }
 
@@ -1119,7 +1103,7 @@ function update(dt) {
   }
 
   // If we have a pending gap midpoint and player prošel za něj, potvrď gap snapshot
-  if (DEBUG && dom.autoplay?.checked && typeof world.pendingGapMidX === 'number') {
+  if (DEBUG && typeof world.pendingGapMidX === 'number') {
     const playerWorldX = world.distance + world.player.x;
     if (playerWorldX > world.pendingGapMidX) {
       const gapSnap = captureSnapshot();
@@ -1196,7 +1180,7 @@ function update(dt) {
         state.power.invulnUntil = world.time + 0.8;
         if (state.audioOn) sounds.hit(260, 0.06);
       } else {
-        if (DEBUG && dom.autoplay?.checked && world.lastGapSnapshot) {
+        if (DEBUG && world.lastGapSnapshot) {
           restoreSnapshot(world.lastGapSnapshot);
           state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
           return; // resume from snapshot
@@ -1228,7 +1212,7 @@ function update(dt) {
           state.power.invulnUntil = world.time + 0.8;
           if (state.audioOn) sounds.hit(260, 0.06);
         } else {
-          if (DEBUG && dom.autoplay?.checked && world.lastGapSnapshot) {
+          if (DEBUG && world.lastGapSnapshot) {
             restoreSnapshot(world.lastGapSnapshot);
             state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
             return;
@@ -1255,7 +1239,7 @@ function update(dt) {
         state.power.invulnUntil = world.time + 0.8;
         if (state.audioOn) sounds.hit(260, 0.06);
       } else {
-        if (DEBUG && dom.autoplay?.checked && world.lastGapSnapshot) {
+        if (DEBUG && world.lastGapSnapshot) {
           restoreSnapshot(world.lastGapSnapshot);
           state.uiToasts.push({ id: Math.random(), text: 'Rewind', born: world.time, dur: 0.8 });
           return;

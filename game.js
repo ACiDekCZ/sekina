@@ -514,7 +514,9 @@ function endGame() {
   // highscore per-level
   const totalEnd = estimateLevelDistanceWithPlanPx(state.level || 1);
   const ratioEnd = totalEnd > 0 ? Math.max(0, Math.min(1, (world.distance + (world.player?.x || 0)) / totalEnd)) : 0;
-  setHighscore(state.level || 1, state.score, ratioEnd);
+  if (!(DEBUG && dom.autoplay?.checked)) {
+    setHighscore(state.level || 1, state.score, ratioEnd);
+  }
   state.best = Math.max(state.best, state.score);
   localStorage.setItem('sekina_best', String(state.best));
   dom.best.textContent = state.best.toString();
@@ -658,7 +660,9 @@ function completeLevel() {
   // save per-level HS (score + furthest ratio) and unlock the next level
   const totalOk = estimateLevelDistanceWithPlanPx(state.level || 1);
   const ratioOk = totalOk > 0 ? Math.max(0, Math.min(1, (world.distance + (world.player?.x || 0)) / totalOk)) : 0;
-  setHighscore(state.level || 1, state.levelScore || 0, ratioOk);
+  if (!(DEBUG && dom.autoplay?.checked)) {
+    setHighscore(state.level || 1, state.levelScore || 0, ratioOk);
+  }
   setUnlocked(state.level || 1);
   refreshLevelSelect();
   // Save successful autoplay replay for this level/seed (debug)
@@ -817,8 +821,9 @@ function simulatePressPlan(pressDelay, holdMs, allowDoubleJump, windowSec = 1.2)
 }
 
 function spawnSpike(xBase) {
-  const width = randRange(CONFIG.obstacle.minWidth, CONFIG.obstacle.maxWidth);
-  const height = randRange(CONFIG.obstacle.minHeight, CONFIG.obstacle.maxHeight);
+  const r = world.levelRng || Math.random;
+  const width = Math.floor(r() * (CONFIG.obstacle.maxWidth - CONFIG.obstacle.minWidth + 1)) + CONFIG.obstacle.minWidth;
+  const height = Math.floor(r() * (CONFIG.obstacle.maxHeight - CONFIG.obstacle.minHeight + 1)) + CONFIG.obstacle.minHeight;
   const x = xBase + width;
   const y = viewport.groundY - height;
   world.obstacles.push({ x, y, width, height, passed: false });
@@ -828,9 +833,10 @@ function spawnSpike(xBase) {
 }
 
 function spawnPlatform(xBase) {
-  const width = randRange(CONFIG.platform.minWidth, CONFIG.platform.maxWidth);
+  const r = world.levelRng || Math.random;
+  const width = Math.floor(r() * (CONFIG.platform.maxWidth - CONFIG.platform.minWidth + 1)) + CONFIG.platform.minWidth;
   const height = CONFIG.platform.height;
-  const rise = randRange(CONFIG.platform.minRise, CONFIG.platform.maxRise);
+  const rise = Math.floor(r() * (CONFIG.platform.maxRise - CONFIG.platform.minRise + 1)) + CONFIG.platform.minRise;
   const x = xBase + width;
   const y = (viewport.groundY - rise) - height;
   world.platforms.push({ x, y, width, height });
@@ -851,7 +857,8 @@ function spawnPlatformAt(x, w, rise) {
 }
 
 function spawnSpikeAt(x, h) {
-  const w = randRange(CONFIG.obstacle.minWidth, CONFIG.obstacle.maxWidth);
+  const r = world.levelRng || Math.random;
+  const w = Math.floor(r() * (CONFIG.obstacle.maxWidth - CONFIG.obstacle.minWidth + 1)) + CONFIG.obstacle.minWidth;
   const y = viewport.groundY - h;
   world.obstacles.push({ x: x + w, y, width: w, height: h, passed: false });
 }
@@ -866,7 +873,8 @@ function spawnTopSpikeAt(x, w, h, yTop) {
 
 function spawnSawAt(x, yFromGround, r, amp, speed) {
   const baseY = viewport.groundY - yFromGround;
-  world.saws.push({ x: x + r * 2, baseY, r, amp, speed, phase: Math.random() * Math.PI * 2 });
+  const rnd = world.levelRng || Math.random;
+  world.saws.push({ x: x + r * 2, baseY, r, amp, speed, phase: rnd() * Math.PI * 2 });
 }
 
 function spawnCoinsLine(x, yFromGround, count, gap) {

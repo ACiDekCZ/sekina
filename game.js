@@ -576,6 +576,124 @@ function circleRectIntersect(cx, cy, r, rect) {
   return (dx * dx + dy * dy) <= r * r;
 }
 
+// --- Autoplay simulation helpers (debug) ---
+function simulatePressPlan(pressDelay, holdMs, allowDoubleJump, windowSec = 0.9) {
+  // Clone minimal player state
+  const sim = {
+    x: world.player.x,
+    y: world.player.y,
+    vy: world.player.vy,
+    width: world.player.width,
+    height: world.player.height,
+    onGround: world.player.onGround,
+    usedDouble: false,
+    jumpHoldMs: 0
+  };
+  const dt = 1 / 120;
+  const t0 = world.time;
+  let t = 0;
+  let pressAt = Math.max(0, pressDelay || 0);
+  const holdTime = Math.max(0, holdMs || 0);
+  let holdUntil = null;
+  // Local copies of dynamic arrays with shallow refs (positions updated by dx)
+  const obs = world.obstacles.map(o => ({...o}));
+  const blks = world.blocks.map(b => ({...b}));
+  const plats = world.platforms.map(p => ({...p}));
+  const saws = world.saws.map(s => ({...s}));
+  const tops = (world.topSpikes||[]).map(tp => ({...tp}));
+  let speed = world.speed;
+
+  function updateEntities(dx, time) {
+    for (const o of obs) o.x += dx;
+    for (const b of blks) b.x += dx;
+    for (const p of plats) p.x += dx;
+    for (const s of saws) s.x += dx;
+    for (const tp of tops) tp.x += dx;
+    // saw cy computed on demand
+  }
+  function playerHitbox() {
+    const hitW = sim.width * 0.72;
+    const hitH = sim.height * 0.60;
+    return { x: sim.x - hitW / 2, y: sim.y + (sim.height - hitH) * 0.5, width: hitW, height: hitH };
+  }
+  function collideRect(a,b){return !(a.x + a.width < b.x || a.x > b.x + b.width || a.y + a.height < b.y || a.y > b.y + b.height);}
+
+  while (t < windowSec) {
+    // Horizontal world moves left
+    const dx = -speed * dt;
+    updateEntities(dx, t0 + t);
+
+    // Handle press
+    if (pressAt <= 0 && sim.onGround && holdUntil === null) {
+      sim.onGround = false;
+      sim.vy = -CONFIG.jumpImpulse;
+      sim.jumpHoldMs = 0;
+      holdUntil = t + holdTime;
+    }
+    pressAt -= dt;
+
+    // Apply hold for variable jump height
+    if (!sim.onGround && holdUntil !== null && t < holdUntil && sim.jumpHoldMs < CONFIG.maxJumpHoldMs) {
+      sim.vy -= 900 * dt;
+      sim.jumpHoldMs += dt * 1000;
+    }
+
+    // gravity
+    sim.vy += CONFIG.gravity * dt;
+    const prevY = sim.y;
+    sim.y += sim.vy * dt;
+
+    // platform landing
+    if (sim.vy >= 0) {
+      const prevBottom = prevY + sim.height;
+      const currBottom = sim.y + sim.height;
+      for (const pf of [...plats, ...blks]) {
+        const top = pf.y;
+        const left = pf.x;
+        const right = pf.x + pf.width;
+        const playerLeft = sim.x - sim.width / 2;
+        const playerRight = sim.x + sim.width / 2;
+        const horizontalOverlap = playerRight > left && playerLeft < right;
+        if (horizontalOverlap && prevBottom <= top && currBottom >= top) {
+          sim.y = top - sim.height;
+          sim.vy = 0;
+          sim.onGround = true;
+          break;
+        }
+      }
+    }
+    // ground
+    const groundTop = viewport.groundY - sim.height;
+    if (sim.y >= groundTop) {
+      sim.y = groundTop;
+      sim.vy = 0;
+      sim.onGround = true;
+    }
+
+    // collisions
+    const pb = playerHitbox();
+    for (const o of obs) { if (collideRect(pb, {x:o.x,y:o.y,width:o.width,height:o.height})) {
+      // try double jump once if allowed
+      if (allowDoubleJump && !sim.onGround && !sim.usedDouble) {
+        sim.vy = -CONFIG.jumpImpulse * 0.9;
+        sim.jumpHoldMs = 0;
+        sim.usedDouble = true;
+        // after double, continue loop to see if it saves us
+      } else {
+        return false;
+      }
+    }}
+    for (const tp of tops) { if (collideRect(pb, {x:tp.x,y:tp.y,width:tp.width,height:tp.height})) return false; }
+    for (const s of saws) {
+      const cy = s.baseY + Math.sin((t0 + t) * s.speed + s.phase) * s.amp;
+      if (circleRectIntersect(s.x, cy, s.r, pb)) return false;
+    }
+
+    t += dt;
+  }
+  return true;
+}
+
 function spawnSpike(xBase) {
   const width = randRange(CONFIG.obstacle.minWidth, CONFIG.obstacle.maxWidth);
   const height = randRange(CONFIG.obstacle.minHeight, CONFIG.obstacle.maxHeight);
@@ -778,9 +896,20 @@ function update(dt) {
     }
 
     if (needJump) {
+      // Validate timing by simulating a few candidate press timings and hold durations
+      let ok = false;
+      const candidates = [0.00, 0.02, -0.02]; // seconds offset
+      const holds = [0.08, 0.12, 0.16];
+      const allowDouble = !!(state?.power?.doubleJumpUntil && world.time < state.power.doubleJumpUntil);
+      for (const off of candidates) {
+        for (const h of holds) {
+          if (simulatePressPlan(Math.max(0, off), h, allowDouble, 0.9)) { ok = true; state.autoHoldUntil = world.time + h; break; }
+        }
+        if (ok) break;
+      }
+      // fallback: basic press with minimal hold
+      if (!ok) state.autoHoldUntil = world.time + 0.1;
       pressedNow = true;
-      // plan a brief hold for taller obstacles
-      state.autoHoldUntil = world.time + 0.12; // ~120ms
     }
   }
   if (player.onGround && pressedNow) {

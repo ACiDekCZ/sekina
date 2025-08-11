@@ -416,17 +416,17 @@ function createInputs(target) {
     pressed.jump = true;
     // record manual press for replay (debug autoplay recording)
     if (DEBUG && dom.autoplay?.checked) {
-      (state.autoRecording ||= []).push({ t: world.time, action: 'press' });
+      (state.autoRecording ||= []).push({ t: world.time, action: 'down' });
     }
     hint(false);
   };
-  const end = (e) => { e.preventDefault(); pressed.jump = false; };
+  const end = (e) => { e.preventDefault(); pressed.jump = false; if (DEBUG && dom.autoplay?.checked) { (state.autoRecording ||= []).push({ t: world.time, action: 'up' }); } };
   // listen on window so taps anywhere trigger jump on mobile
   window.addEventListener('pointerdown', start, { passive: false });
   window.addEventListener('pointerup', end);
-  window.addEventListener('keydown', (e) => { if ((e.code === 'Space' || e.code === 'ArrowUp') && !e.repeat) { if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; hint(false);} });
+  window.addEventListener('keydown', (e) => { if ((e.code === 'Space' || e.code === 'ArrowUp') && !e.repeat) { if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; if (DEBUG && dom.autoplay?.checked) { (state.autoRecording ||= []).push({ t: world.time, action: 'down' }); } hint(false);} });
   window.addEventListener('keydown', (e) => { if (e.code === 'KeyH') state.debugHitbox = !state.debugHitbox; });
-  window.addEventListener('keyup', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') pressed.jump = false; });
+  window.addEventListener('keyup', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') { pressed.jump = false; if (DEBUG && dom.autoplay?.checked) { (state.autoRecording ||= []).push({ t: world.time, action: 'up' }); } } });
   return {
     isJumping: () => pressed.jump,
     consumePress: () => { const was = pressed.justPressed; pressed.justPressed = false; return was; }
@@ -976,8 +976,11 @@ function update(dt) {
   player.vy += CONFIG.gravity * dt;
 
   // jump
-  let pressedNow = inputs.consumePress() || !!state._injectPress;
-  state._injectPress = false;
+  // Apply replay injections (down/up) into inputs
+  if (state._injectDown) { state._injectDown = false; state._replayHolding = true; state._replayJust = true; }
+  if (state._injectUp) { state._injectUp = false; state._replayHolding = false; }
+  let pressedNow = inputs.consumePress() || !!state._replayJust;
+  state._replayJust = false;
   // Debug autoplay now does not auto-press; it only records (handled in input) and rewinds on fail
   if (player.onGround && pressedNow) {
     player.onGround = false;
@@ -989,7 +992,7 @@ function update(dt) {
     player.jumpHoldMs = 0;
     player.usedDoubleJumpInAir = true;
     if (state.audioOn) sounds.jump(740, 0.05);
-  } else if (!player.onGround && (inputs.isJumping()) && player.jumpHoldMs < CONFIG.maxJumpHoldMs) {
+  } else if (!player.onGround && ((inputs.isJumping()) || state._replayHolding) && player.jumpHoldMs < CONFIG.maxJumpHoldMs) {
     player.vy -= 900 * dt; // variable jump height
     player.jumpHoldMs += dt * 1000;
   }
@@ -1541,16 +1544,16 @@ function draw(timestamp) {
   drawBackground(ctx);
 
   if (state.running) {
-    // If playing a replay, inject press events at scheduled times
+    // If playing a replay, inject down/up events precisely
     if (state.replay && state.replay.actions) {
       const tRel = world.time - (state.replayStartTime || 0);
-      const next = state.replay.actions[state.replayPtr || 0];
-      if (next && tRel >= (next.t || 0)) {
-        // simulate an input press by queuing it in inputs
-        // We cannot directly poke inputs; instead, call a minimal hook:
-        // set a small flag to be consumed in update()
-        state._injectPress = true;
-        state.replayPtr += 1;
+      while (true) {
+        const idx = state.replayPtr || 0;
+        const next = state.replay.actions[idx];
+        if (!next || tRel < (next.t || 0)) break;
+        if (next.action === 'down') state._injectDown = true;
+        else if (next.action === 'up') state._injectUp = true;
+        state.replayPtr = idx + 1;
       }
     }
     update(dt);

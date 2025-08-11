@@ -589,6 +589,8 @@ function captureSnapshot() {
     time: world.time,
     speed: world.speed,
     distance: world.distance,
+    levelTimeLeft: world.levelTimeLeft,
+    levelElapsed: world.levelElapsed,
     player: { ...world.player },
     obstacles: world.obstacles.map(o => ({ ...o })),
     platforms: world.platforms.map(p => ({ ...p })),
@@ -607,6 +609,8 @@ function restoreSnapshot(s) {
   world.time = s.time;
   world.speed = s.speed;
   world.distance = s.distance;
+  if (typeof s.levelTimeLeft === 'number') world.levelTimeLeft = s.levelTimeLeft;
+  if (typeof s.levelElapsed === 'number') world.levelElapsed = s.levelElapsed;
   world.player = { ...s.player };
   world.obstacles = s.obstacles.map(o => ({ ...o }));
   world.platforms = s.platforms.map(p => ({ ...p }));
@@ -617,12 +621,9 @@ function restoreSnapshot(s) {
   world.topSpikes = s.topSpikes.map(t => ({ ...t }));
   world.spawnCursorX = s.spawnCursorX;
   world.nextSectionIndex = s.nextSectionIndex;
-  // If we annotated a desired world X (gap midpoint), align player's world position there
-  if (typeof s.worldX === 'number') {
-    const desiredWorldX = s.worldX;
-    // set distance so that player's current screen x maps to desired world x
-    // worldX(player) = world.distance + player.x
-    world.distance = Math.max(0, desiredWorldX - world.player.x);
+  // If we annotated a desired world distance override, use it
+  if (typeof s.distanceOverride === 'number') {
+    world.distance = Math.max(0, s.distanceOverride);
   }
 }
 
@@ -894,7 +895,8 @@ function spawnSection(section) {
     const gapMid = Math.floor((gapStart + gapEnd) / 2);
     // To place player at gapMid on restore, we capture snapshot and encode target world.distance
     const gapSnap = captureSnapshot();
-    gapSnap.worldX = gapMid; // annotate desired world X for player position restoration
+    // distanceOverride = desiredWorldX - player.x
+    gapSnap.distanceOverride = Math.max(0, gapMid - world.player.x);
     world.lastGapSnapshot = gapSnap;
     world.lastGapSectionIndex = world.sections.length; // index of upcoming section
   }
@@ -1277,6 +1279,24 @@ function drawBackground(ctx) {
   ctx.fillStyle = '#ffffffbb';
   ctx.fillRect(mx - 1, y0 - 2, 2, barHeight + 4);
   ctx.restore();
+
+  // Debug: draw marker for last gap snapshot (where rewind returns)
+  if (DEBUG && dom.autoplay?.checked && world.lastGapSnapshot && typeof world.lastGapSnapshot.distanceOverride === 'number') {
+    const markerWorldX = world.lastGapSnapshot.distanceOverride + world.player.x;
+    const screenX = markerWorldX - world.distance;
+    if (screenX > -40 && screenX < viewport.width + 40) {
+      ctx.save();
+      ctx.globalAlpha = 0.9;
+      ctx.strokeStyle = '#22d3ee';
+      ctx.setLineDash([6, 6]);
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(Math.floor(screenX), 0);
+      ctx.lineTo(Math.floor(screenX), viewport.groundY);
+      ctx.stroke();
+      ctx.restore();
+    }
+  }
 }
 
 function drawPlayer(ctx) {

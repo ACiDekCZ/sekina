@@ -663,18 +663,9 @@ function completeLevel() {
       dom.copyReplay?.classList.remove('hidden');
     } catch {}
   }
-
-  // auto-advance to the next level (if any)
-  const current = state.level || 1;
-  if (current < LEVELS.length) {
-    state.level = current + 1;
-    startLevel(state.level);
-    state.running = true;
-  } else {
-    // last level – show completion info
-    state.running = false;
-    dom.leveldone?.classList.add('visible');
-  }
+  // Show level complete overlay and wait for user action
+  state.running = false;
+  dom.leveldone?.classList.add('visible');
 }
 
 function hint(show) {
@@ -1062,7 +1053,7 @@ function update(dt) {
     }
   }
 
-  // Time limit handling: once time is up, finish the current section
+  // Time limit handling: once time is up, finish in the QUIET ZONE after the current section
   if (!world.timeUp && world.levelTimeLeft <= 0) {
     world.timeUp = true;
     world.stopSpawning = true;
@@ -1076,17 +1067,18 @@ function update(dt) {
     // fallback: if not found (e.g., early), take the last spawned section
     const selected = current || world.sections[world.sections.length - 1];
     if (selected) {
+      // finish point is midway through the QUIET gap after this section
       world.finalSectionEndX = selected.endX;
-      world.finishX = selected.endX;
+      world.finishX = selected.endX + Math.max(80, CONFIG.startGapPx * 0.5);
     } else {
       // if nothing spawned yet, complete immediately
       world.finalSectionEndX = world.distance + 1;
       world.finishX = world.finalSectionEndX;
     }
   }
-  if (world.timeUp && world.finalSectionEndX != null) {
+  if (world.timeUp && world.finishX != null) {
     const playerWorldX = world.distance + world.player.x;
-    if (playerWorldX >= world.finalSectionEndX) {
+    if (playerWorldX >= world.finishX) {
       completeLevel();
       return;
     }

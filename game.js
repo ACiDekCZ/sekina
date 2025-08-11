@@ -180,7 +180,7 @@ function buildLevelSelect() {
       const target = lv.id;
       dom.menu.classList.remove('visible');
       dom.gameover.classList.remove('visible');
-      dom.how.classList.remove('visible');
+      dom.how?.classList.remove('visible');
       // pokud je debug, nastavíme input levelu, aby se vzal v startLevel
       if (DEBUG) {
         const lvEl = document.getElementById('level');
@@ -469,7 +469,7 @@ function startGame() {
   state.running = true;
   dom.menu.classList.remove('visible');
   dom.gameover.classList.remove('visible');
-  dom.how.classList.remove('visible');
+  dom.how?.classList.remove('visible');
   hint(true);
 }
 
@@ -562,6 +562,42 @@ function startLevel(levelNumber) {
     state.overrideBaseSeed = state.overrideBaseSeed || undefined;
     // start paused or running based on checkbox? keep running
   }
+}
+
+// --- Snapshot/rewind helpers (debug) ---
+function captureSnapshot() {
+  return {
+    time: world.time,
+    speed: world.speed,
+    distance: world.distance,
+    player: { ...world.player },
+    obstacles: world.obstacles.map(o => ({ ...o })),
+    platforms: world.platforms.map(p => ({ ...p })),
+    blocks: world.blocks.map(b => ({ ...b })),
+    saws: world.saws.map(s => ({ ...s })),
+    coins: world.coins.map(c => ({ ...c })),
+    bonuses: world.bonuses.map(b => ({ ...b })),
+    topSpikes: (world.topSpikes||[]).map(t => ({ ...t })),
+    spawnCursorX: world.spawnCursorX,
+    nextSectionIndex: world.nextSectionIndex
+  };
+}
+
+function restoreSnapshot(s) {
+  if (!s) return;
+  world.time = s.time;
+  world.speed = s.speed;
+  world.distance = s.distance;
+  world.player = { ...s.player };
+  world.obstacles = s.obstacles.map(o => ({ ...o }));
+  world.platforms = s.platforms.map(p => ({ ...p }));
+  world.blocks = s.blocks.map(b => ({ ...b }));
+  world.saws = s.saws.map(x => ({ ...x }));
+  world.coins = s.coins.map(c => ({ ...c }));
+  world.bonuses = s.bonuses.map(b => ({ ...b }));
+  world.topSpikes = s.topSpikes.map(t => ({ ...t }));
+  world.spawnCursorX = s.spawnCursorX;
+  world.nextSectionIndex = s.nextSectionIndex;
 }
 
 function completeLevel() {

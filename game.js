@@ -1,7 +1,7 @@
 // Embedded demo replays (author-provided), per level id
 const DEMO_REPLAYS = {
   
-  1: {"meta":{"seed":"2-L1","level":1,"when":1754928105000},"actions":[{"t":2.366666666666661,"action":"down"},{"t":2.5166666666666604,"action":"up"},{"t":3.633333333333323,"action":"down"},{"t":3.899999999999989,"action":"up"},{"t":5.066666666666708,"action":"down"},{"t":5.566666666666733,"action":"up"},{"t":6.166666666666763,"action":"down"},{"t":6.31666666666677,"action":"up"},{"t":7.11666666666681,"action":"down"},{"t":7.25000000000015,"action":"up"},{"t":10.533333333333376,"action":"down"},{"t":10.716666666666699,"action":"up"},{"t":11.399999999999993,"action":"down"},{"t":11.599999999999982,"action":"up"},{"t":12.366666666666605,"action":"down"},{"t":12.49999999999993,"action":"up"},{"t":15.599999999999755,"action":"down"},{"t":15.73333333333308,"action":"up"},{"t":16.666666666666362,"action":"down"},{"t":16.824999999999687,"action":"up"},{"t":17.699999999999637,"action":"down"},{"t":17.833333333332963,"action":"up"},{"t":20.53333333333281,"action":"down"},{"t":20.699999999999466,"action":"up"},{"t":21.483333333332755,"action":"down"},{"t":21.683333333332744,"action":"up"},{"t":25.63333333333252,"action":"down"},{"t":25.86666666666584,"action":"up"},{"t":25.558333333332524,"action":"down"},{"t":26.241666666665818,"action":"up"},{"t":25.624999999999186,"action":"down"},{"t":25.80833333333251,"action":"up"},{"t":30.374999999998916,"action":"down"},{"t":30.624999999998902,"action":"up"},{"t":31.8416666666655,"action":"down"},{"t":32.00833333333216,"action":"up"},{"t":35.32499999999864,"action":"down"},{"t":35.491666666665296,"action":"up"},{"t":36.391666666665245,"action":"down"},{"t":37.358333333331856,"action":"up"},{"t":35.50833333333196,"action":"down"},{"t":35.62499999999862,"action":"up"},{"t":36.22499999999859,"action":"down"},{"t":36.391666666665245,"action":"up"},{"t":35.4416666666653,"action":"down"},{"t":35.54166666666529,"action":"up"},{"t":36.158333333331925,"action":"down"},{"t":36.274999999998585,"action":"up"},{"t":37.208333333331865,"action":"down"},{"t":37.358333333331856,"action":"up"},{"t":35.35833333333197,"action":"down"},{"t":35.47499999999863,"action":"up"},{"t":36.09166666666526,"action":"down"},{"t":36.191666666665256,"action":"up"},{"t":37.124999999998536,"action":"down"},{"t":37.25833333333186,"action":"up"},{"t":41.55833333333162,"action":"down"},{"t":41.89166666666493,"action":"up"},{"t":42.658333333331555,"action":"down"},{"t":42.891666666664875,"action":"up"},{"t":48.00833333333125,"action":"down"},{"t":48.60833333333122,"action":"up"},{"t":47.991666666664585,"action":"down"},{"t":48.82499999999787,"action":"up"},{"t":49.30833333333118,"action":"down"},{"t":49.508333333331166,"action":"up"},{"t":53.65833333333093,"action":"down"},{"t":53.84166666666425,"action":"up"},{"t":53.699999999997594,"action":"down"},{"t":54.2333333333309,"action":"up"},{"t":59.31666666666394,"action":"down"},{"t":59.999999999997236,"action":"up"},{"t":60.24999999999722,"action":"down"},{"t":60.44999999999721,"action":"up"}]}
+  1: {"meta":{"seed":"2-L1","level":1,"when":1754976219693},"actions":[{"t":2.366666666666661,"k":284,"action":"down"},{"t":2.533333333333327,"k":304,"action":"up"},{"t":3.4833333333333236,"k":418,"action":"down"},{"t":3.983333333333322,"k":478,"action":"up"},{"t":5.066666666666708,"k":608,"action":"down"},{"t":5.333333333333388,"k":640,"action":"up"},{"t":6.016666666666755,"k":722,"action":"down"},{"t":6.191666666666764,"k":743,"action":"up"},{"t":7.133333333333478,"k":856,"action":"down"},{"t":7.4333333333334926,"k":892,"action":"up"},{"t":10.558333333333374,"k":1267,"action":"down"},{"t":10.716666666666699,"k":1286,"action":"up"},{"t":11.44999999999999,"k":1374,"action":"down"},{"t":11.616666666666648,"k":1394,"action":"up"},{"t":12.38333333333327,"k":1486,"action":"down"},{"t":12.516666666666596,"k":1502,"action":"up"},{"t":13.149999999999894,"k":1578,"action":"down"},{"t":13.366666666666548,"k":1604,"action":"up"},{"t":15.433333333333097,"k":1852,"action":"down"},{"t":15.683333333333083,"k":1882,"action":"up"},{"t":16.5999999999997,"k":1992,"action":"down"},{"t":16.733333333333025,"k":2008,"action":"up"},{"t":17.64999999999964,"k":2118,"action":"down"},{"t":17.816666666666297,"k":2138,"action":"up"},{"t":20.41666666666615,"k":2450,"action":"down"},{"t":20.633333333332804,"k":2476,"action":"up"},{"t":21.549999999999418,"k":2586,"action":"down"},{"t":21.81666666666607,"k":2618,"action":"up"},{"t":25.624999999999186,"k":3074,"action":"down"},{"t":25.80833333333251,"k":3096,"action":"up"},{"t":30.408333333332248,"k":3648,"action":"down"},{"t":30.741666666665562,"k":3688,"action":"up"},{"t":31.891666666665497,"k":3826,"action":"down"},{"t":32.04166666666549,"k":3844,"action":"up"},{"t":35.3666666666653,"k":4242,"action":"down"},{"t":35.4666666666653,"k":4254,"action":"up"},{"t":36.099999999998595,"k":4330,"action":"down"},{"t":36.216666666665255,"k":4344,"action":"up"},{"t":37.183333333331866,"k":4460,"action":"down"},{"t":37.31666666666519,"k":4476,"action":"up"},{"t":41.549999999998285,"k":4984,"action":"down"},{"t":41.74999999999827,"k":5008,"action":"up"},{"t":42.66666666666489,"k":5118,"action":"down"},{"t":42.833333333331545,"k":5138,"action":"up"},{"t":47.96666666666459,"k":5754,"action":"down"},{"t":48.73333333333121,"k":5846,"action":"up"},{"t":49.28333333333118,"k":5912,"action":"down"},{"t":49.69999999999782,"k":5962,"action":"up"},{"t":52.25833333333101,"k":6269,"action":"up"},{"t":53.70833333333093,"k":6443,"action":"down"},{"t":54.52499999999755,"k":6541,"action":"up"},{"t":58.73333333333064,"k":7046,"action":"up"},{"t":59.416666666663936,"k":7128,"action":"down"},{"t":59.616666666663924,"k":7152,"action":"up"},{"t":60.29999999999722,"k":7234,"action":"down"},{"t":60.466666666663876,"k":7254,"action":"up"},{"t":61.19999999999717,"k":7342,"action":"down"},{"t":61.63333333333048,"k":7394,"action":"up"}]}
 };
 
 
@@ -15,6 +15,7 @@ const CONFIG = {
   jumpImpulse: 900, // px/s – a bit more juice for a bigger dog
   maxJumpHoldMs: 240,
   groundYRatio: 0.78,
+  portraitGroundYRatio: 0.88,
   player: { x: 120, width: 84, height: 56 },
   speed: 320, // start speed px/s
   speedGain: 0.22, // per second
@@ -50,6 +51,9 @@ const DEBUG = (() => {
   }
 })();
 
+// Toggle for drawing section start/end debug lines (keep gap markers visible)
+const SHOW_SECTION_BOUNDS = false;
+
 // Preset seeds for 10 levels (tweak as needed)
 const PRESET_LEVEL_SEEDS = [
   '2',
@@ -70,7 +74,7 @@ const LEVEL_DURATION_SEC = 60;
 const state = {
   running: false,
   audioOn: true,
-  best: Number(localStorage.getItem('sekina_best') || 0),
+  best: 0,
   score: 0,
   levelScore: 0,
   debugHitbox: false,
@@ -108,7 +112,8 @@ const dom = {
   mute: document.getElementById('mute')
 };
 
-dom.best.textContent = state.best.toString();
+// Show per-level best (default to level 1 before selection)
+dom.best.textContent = String(getHighFor(1).score || 0);
 // Level names kept short for mobile
 const LEVELS = [
   { id: 1, title: 'Start' },
@@ -182,6 +187,8 @@ function buildLevelSelect() {
   const { unlocked, highs } = getProgress();
   container.innerHTML = '';
   LEVELS.forEach(lv => {
+    // In non-debug: show only levels that have embedded replay demo
+    if (!DEBUG && !hasEmbeddedDemo(lv.id)) return;
     const btn = document.createElement('button');
     btn.className = 'level-btn' + (lv.id > unlocked && !DEBUG ? ' locked' : '');
     btn.disabled = (lv.id > unlocked && !DEBUG);
@@ -206,6 +213,8 @@ function buildLevelSelect() {
       } else {
         state.level = target;
       }
+      // update per-level best in HUD for selected level
+      try { dom.best.textContent = String(getHighFor(target).score || 0); } catch {}
       resetRun();
       state.level = target;
       state.running = true;
@@ -316,7 +325,11 @@ function resizeCanvasToCSSPixels() {
   viewport = {
     width,
     height,
-    groundY: Math.floor(height * CONFIG.groundYRatio)
+    groundY: (() => {
+      const isPortrait = height > width;
+      const ratio = isPortrait ? (CONFIG.portraitGroundYRatio || CONFIG.groundYRatio) : CONFIG.groundYRatio;
+      return Math.floor(height * ratio);
+    })()
   };
 }
 
@@ -415,23 +428,25 @@ function createInputs(target) {
     // allow tap anywhere to jump, but only during active gameplay
     const gameActive = state.running && !dom.menu.classList.contains('visible') && !dom.gameover.classList.contains('visible') && !dom.leveldone.classList.contains('visible');
     if (!gameActive) return;
+    // ignore manual input during replay (hint/demo)
+    if (state.replay) return;
     // In debug autoplay mode we still allow manual taps (we only record/rewind)
     e.preventDefault();
     if (!pressed.jump) pressed.justPressed = true;
     pressed.jump = true;
     // record manual press for replay (debug autoplay recording)
     if (DEBUG) {
-      (state.autoRecording ||= []).push({ t: world.time, action: 'down' });
+      (state.autoRecording ||= []).push({ t: world.time, k: world.tick || 0, action: 'down' });
     }
     hint(false);
   };
-  const end = (e) => { e.preventDefault(); pressed.jump = false; if (DEBUG) { (state.autoRecording ||= []).push({ t: world.time, action: 'up' }); } };
+  const end = (e) => { e.preventDefault(); pressed.jump = false; if (DEBUG && !state.replay) { (state.autoRecording ||= []).push({ t: world.time, k: world.tick || 0, action: 'up' }); } };
   // listen on window so taps anywhere trigger jump on mobile
   window.addEventListener('pointerdown', start, { passive: false });
   window.addEventListener('pointerup', end);
-  window.addEventListener('keydown', (e) => { if ((e.code === 'Space' || e.code === 'ArrowUp') && !e.repeat) { if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; if (DEBUG) { (state.autoRecording ||= []).push({ t: world.time, k: world.tick||0, action: 'down' }); } hint(false);} });
+  window.addEventListener('keydown', (e) => { if ((e.code === 'Space' || e.code === 'ArrowUp') && !e.repeat) { if (state.replay) return; if (!pressed.jump) pressed.justPressed = true; pressed.jump = true; if (DEBUG && !state.replay) { (state.autoRecording ||= []).push({ t: world.time, k: world.tick||0, action: 'down' }); } hint(false);} });
   window.addEventListener('keydown', (e) => { if (e.code === 'KeyH') state.debugHitbox = !state.debugHitbox; });
-  window.addEventListener('keyup', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') { pressed.jump = false; if (DEBUG) { (state.autoRecording ||= []).push({ t: world.time, k: world.tick||0, action: 'up' }); } } });
+  window.addEventListener('keyup', (e) => { if (e.code === 'Space' || e.code === 'ArrowUp') { pressed.jump = false; if (DEBUG && !state.replay) { (state.autoRecording ||= []).push({ t: world.time, k: world.tick||0, action: 'up' }); } } });
 // Rewind to previous autosave in autoplay (debug)
 window.addEventListener('keydown', (e) => {
   if (!DEBUG) return;
@@ -465,6 +480,7 @@ function createWorld() {
     time: 0,
     speed: CONFIG.speed,
     distance: 0,
+    groundY: 0,
     player: {
       x: CONFIG.player.x,
       y: 0,
@@ -496,6 +512,7 @@ function createWorld() {
     lastGapMidWX: null,
     pendingGapMidWX: null,
     gapSnapshots: [],
+    gapQueue: [],
     levelTimeLeft: LEVEL_DURATION_SEC,
     levelElapsed: 0,
     tick: 0
@@ -510,6 +527,8 @@ function resetRun() {
   state.power = { shieldHits: 0, doubleJumpUntil: 0, invulnUntil: 0 };
   // level may be chosen from menu; default to 1
   state.level = state.level || 1;
+  // update per-level best on UI for chosen level
+  try { dom.best.textContent = String(getHighFor(state.level).score || 0); } catch {}
   startLevel(state.level);
 }
 
@@ -531,10 +550,9 @@ function endGame() {
   if (!DEBUG) {
     setHighscore(state.level || 1, state.score, ratioEnd);
   }
-  state.best = Math.max(state.best, state.score);
-  localStorage.setItem('sekina_best', String(state.best));
-  dom.best.textContent = state.best.toString();
-  dom.finalBest.textContent = state.best.toString();
+  const hi = getHighFor(state.level || 1);
+  dom.best.textContent = String(hi.score || 0);
+  dom.finalBest.textContent = String(hi.score || 0);
   dom.gameover.classList.add('visible');
   shake();
   // Show hint (demo) after 5 fails if embedded demo exists
@@ -558,8 +576,16 @@ function startLevel(levelNumber) {
   world.levelTimeLeft = LEVEL_DURATION_SEC;
   world.speed = CONFIG.speed;
   world.distance = 0;
-  // place player safely on ground at start
-  world.player.y = viewport.groundY - world.player.height;
+  // reset simulation ticks and any leftover replay/input accumulators
+  world.tick = 0;
+  state._accum = 0;
+  state._injectDown = false;
+  state._injectUp = false;
+  state._replayHolding = false;
+  state._replayJust = false;
+  // place player safely on ground at start and lock groundY for deterministic gameplay
+  world.groundY = viewport.groundY;
+  world.player.y = world.groundY - world.player.height;
   world.player.vy = 0;
   world.player.onGround = true;
   state.levelScore = 0;
@@ -602,6 +628,8 @@ function startLevel(levelNumber) {
   world.coins.length = 0;
   world.bonuses.length = 0;
   world.topSpikes = [];
+  // reset powerups/invuln
+  state.power = { shieldHits: 0, doubleJumpUntil: 0, invulnUntil: 0 };
   // propagate chosen level to state for UI and fallbacks
   state.level = chosenLevel;
   world.plannedSections = buildPlanForLevel(chosenLevel);
@@ -611,6 +639,9 @@ function startLevel(levelNumber) {
   world.timeUp = false;
   world.finalSectionEndX = null;
   world.finishX = null;
+  world.gapSnapshots = [];
+  world.pendingGapMidWX = null;
+  world.lastGapMidWX = null;
   world.spawnCursorX = CONFIG.startGapPx + viewport.width * 0; // device-independent fixed start gap
   // refresh level select UI (HS, lock states)
   refreshLevelSelect();
@@ -630,6 +661,10 @@ function captureSnapshot() {
     time: world.time,
     speed: world.speed,
     distance: world.distance,
+    stopSpawning: !!world.stopSpawning,
+    timeUp: !!world.timeUp,
+    finalSectionEndX: world.finalSectionEndX,
+    finishX: world.finishX,
     levelTimeLeft: world.levelTimeLeft,
     levelElapsed: world.levelElapsed,
     power: { ...(state.power || {}) },
@@ -643,7 +678,10 @@ function captureSnapshot() {
     bonuses: world.bonuses.map(b => ({ ...b })),
     topSpikes: (world.topSpikes||[]).map(t => ({ ...t })),
     spawnCursorX: world.spawnCursorX,
-    nextSectionIndex: world.nextSectionIndex
+    nextSectionIndex: world.nextSectionIndex,
+    sections: (world.sections||[]).map(s => ({ ...s })),
+    pendingGapMidWX: (typeof world.pendingGapMidWX === 'number') ? world.pendingGapMidWX : null,
+    lastGapMidWX: (typeof world.lastGapMidWX === 'number') ? world.lastGapMidWX : null
   };
 }
 
@@ -652,6 +690,10 @@ function restoreSnapshot(s) {
   world.time = s.time;
   world.speed = s.speed;
   world.distance = s.distance;
+  world.stopSpawning = !!s.stopSpawning;
+  world.timeUp = !!s.timeUp;
+  world.finalSectionEndX = (s.finalSectionEndX ?? null);
+  world.finishX = (s.finishX ?? null);
   if (typeof s.levelTimeLeft === 'number') world.levelTimeLeft = s.levelTimeLeft;
   if (typeof s.levelElapsed === 'number') world.levelElapsed = s.levelElapsed;
   if (s.power) state.power = { ...s.power };
@@ -671,9 +713,30 @@ function restoreSnapshot(s) {
   world.topSpikes = s.topSpikes.map(t => ({ ...t }));
   world.spawnCursorX = s.spawnCursorX;
   world.nextSectionIndex = s.nextSectionIndex;
+  world.sections = Array.isArray(s.sections) ? s.sections.map(x => ({ ...x })) : (world.sections || []);
   // If we annotated a desired world distance override, use it
   if (typeof s.distanceOverride === 'number') {
     world.distance = Math.max(0, s.distanceOverride);
+  }
+  // Restore gap markers from snapshot and rebuild queue
+  world.lastGapMidWX = (typeof s.lastGapMidWX === 'number') ? s.lastGapMidWX : null;
+  world.pendingGapMidWX = (typeof s.pendingGapMidWX === 'number') ? s.pendingGapMidWX : null;
+  // Recompute future gaps queue from current sections relative to player
+  const playerWorldX = world.distance + world.player.x;
+  world.gapQueue = [];
+  if (Array.isArray(world.sections) && world.sections.length >= 2) {
+    for (let i = 1; i < world.sections.length; i++) {
+      const prev = world.sections[i - 1];
+      const cur = world.sections[i];
+      const quietWidth = cur.startWX - prev.endWX;
+      if (quietWidth > 40) {
+        const gapMid = prev.endWX + quietWidth / 2;
+        if (gapMid > playerWorldX + 20) world.gapQueue.push(gapMid);
+      }
+    }
+  }
+  if (world.gapQueue.length && (world.pendingGapMidWX == null || world.pendingGapMidWX <= playerWorldX)) {
+    world.pendingGapMidWX = world.gapQueue[0];
   }
   // If recording debug actions, trim any recorded actions beyond restored tick
   if (DEBUG && Array.isArray(state.autoRecording) && state.autoRecording.length) {
@@ -691,19 +754,25 @@ function completeLevel() {
   }
   setUnlocked(state.level || 1);
   refreshLevelSelect();
-  // Save successful autoplay replay for this level/seed (debug)
+  // In debug: nabídnout kopii replaye (bez ukládání do localStorage)
   if (DEBUG && Array.isArray(state.autoRecording) && state.autoRecording.length > 0) {
-    try {
-      const key = `sekina_replay_L${state.level}`;
-      const meta = { seed: world.seedStr, level: state.level, when: Date.now() };
-      localStorage.setItem(key, JSON.stringify({ meta, actions: state.autoRecording }));
-      state.uiToasts.push({ id: Math.random(), text: 'Replay saved', born: world.time, dur: 1.2 });
-      // show copy button
-      dom.copyReplay?.classList.remove('hidden');
-    } catch {}
+    dom.copyReplay?.classList.remove('hidden');
   }
   // Show level complete overlay and wait for user action
   state.running = false;
+  // Toggle Next Level button visibility depending on availability
+  (function updateNextLevelButton() {
+    const current = state.level || 1;
+    let next = Math.min(current + 1, LEVELS.length);
+    if (!DEBUG) {
+      while (next <= LEVELS.length && !hasEmbeddedDemo(next)) next++;
+    }
+    if (next <= LEVELS.length) {
+      dom.nextLevel?.classList.remove('hidden');
+    } else {
+      dom.nextLevel?.classList.add('hidden');
+    }
+  })();
   dom.leveldone?.classList.add('visible');
 }
 
@@ -816,7 +885,7 @@ function simulatePressPlan(pressDelay, holdMs, allowDoubleJump, windowSec = 1.2)
       }
     }
     // ground
-    const groundTop = viewport.groundY - sim.height;
+  const groundTop = world.groundY - sim.height;
     if (sim.y >= groundTop) {
       sim.y = groundTop;
       sim.vy = 0;
@@ -851,7 +920,7 @@ function spawnSpike(xBase) {
   const width = Math.floor(r() * (CONFIG.obstacle.maxWidth - CONFIG.obstacle.minWidth + 1)) + CONFIG.obstacle.minWidth;
   const height = Math.floor(r() * (CONFIG.obstacle.maxHeight - CONFIG.obstacle.minHeight + 1)) + CONFIG.obstacle.minHeight;
   const x = xBase + width;
-  const y = viewport.groundY - height;
+  const y = world.groundY - height;
   world.obstacles.push({ x, y, width, height, passed: false });
   if (Math.random() < CONFIG.coinRate) {
     world.coins.push({ x: x + width * 0.5, y: y - 48, width: 28, height: 28, taken: false });
@@ -864,7 +933,7 @@ function spawnPlatform(xBase) {
   const height = CONFIG.platform.height;
   const rise = Math.floor(r() * (CONFIG.platform.maxRise - CONFIG.platform.minRise + 1)) + CONFIG.platform.minRise;
   const x = xBase + width;
-  const y = (viewport.groundY - rise) - height;
+  const y = (world.groundY - rise) - height;
   world.platforms.push({ x, y, width, height });
   if (Math.random() < CONFIG.coinRate) {
     world.coins.push({ x: x + width * 0.5, y: y - 40, width: 28, height: 28, taken: false });
@@ -872,7 +941,7 @@ function spawnPlatform(xBase) {
 }
 
 function spawnBlockAt(x, w, h) {
-  const y = viewport.groundY - h;
+  const y = world.groundY - h;
   const obj = { x: x + w, y, width: w, height: h };
   world.blocks.push(obj);
   return obj;
@@ -880,16 +949,16 @@ function spawnBlockAt(x, w, h) {
 
 function spawnPlatformAt(x, w, rise) {
   const h = CONFIG.platform.height;
-  const y = (viewport.groundY - rise) - h;
+  const y = (world.groundY - rise) - h;
   const obj = { x: x + w, y, width: w, height: h };
   world.platforms.push(obj);
   return obj;
 }
 
 function spawnSpikeAt(x, h) {
-  const r = world.levelRng || Math.random;
+  const r = (world.levelRng || Math.random);
   const w = Math.floor(r() * (CONFIG.obstacle.maxWidth - CONFIG.obstacle.minWidth + 1)) + CONFIG.obstacle.minWidth;
-  const y = viewport.groundY - h;
+  const y = world.groundY - h;
   const obj = { x: x + w, y, width: w, height: h, passed: false };
   world.obstacles.push(obj);
   return obj;
@@ -897,7 +966,7 @@ function spawnSpikeAt(x, h) {
 
 function spawnTopSpikeAt(x, w, h, yTop) {
   const spikeHeight = h;
-  const maxBottom = viewport.groundY - 140; // minimální clearance nad zemí
+  const maxBottom = world.groundY - 140; // minimální clearance nad zemí
   const desiredTop = Math.max(0, (yTop ?? 0));
   const clampedTop = Math.min(desiredTop, Math.max(0, maxBottom - spikeHeight));
   const obj = { x: x + w, y: clampedTop, width: w, height: spikeHeight };
@@ -906,15 +975,15 @@ function spawnTopSpikeAt(x, w, h, yTop) {
 }
 
 function spawnSawAt(x, yFromGround, r, amp, speed) {
-  const baseY = viewport.groundY - yFromGround;
-  const rnd = world.levelRng || Math.random;
+  const baseY = world.groundY - yFromGround;
+  const rnd = (world.levelRng || Math.random);
   const obj = { x: x + r * 2, baseY, r, amp, speed, phase: rnd() * Math.PI * 2 };
   world.saws.push(obj);
   return obj;
 }
 
 function spawnCoinsLine(x, yFromGround, count, gap) {
-  const y = (viewport.groundY - yFromGround) - 14;
+  const y = (world.groundY - yFromGround) - 14;
   for (let i = 0; i < count; i++) {
     const cx = x + i * gap;
     world.coins.push({ x: cx, y, width: 28, height: 28, taken: false });
@@ -923,7 +992,7 @@ function spawnCoinsLine(x, yFromGround, count, gap) {
 
 function spawnCoinsArc(x, yFromGround, radius, spread) {
   const centerX = x;
-  const centerY = viewport.groundY - yFromGround;
+  const centerY = world.groundY - yFromGround;
   const steps = Math.max(4, Math.floor(spread / 0.35));
   for (let i = 0; i < steps; i++) {
     const t = -spread / 2 + (i / (steps - 1)) * spread;
@@ -934,7 +1003,7 @@ function spawnCoinsArc(x, yFromGround, radius, spread) {
 }
 
 function spawnBonusAt(x, yFromGround, kind) {
-  const y = (viewport.groundY - yFromGround) - 14;
+  const y = (world.groundY - yFromGround) - 14;
   const type = kind === 'double' ? 'double' : 'shield';
   world.bonuses.push({ x, y, width: 28, height: 28, type, taken: false });
 }
@@ -951,7 +1020,7 @@ function spawnSection(section) {
     .filter(it => it.t === 'platform')
     .map(it => ({
       dx: it.dx || 0,
-      yTop: (viewport.groundY - (it.rise ?? 100)) - CONFIG.platform.height
+      yTop: (world.groundY - (it.rise ?? 100)) - CONFIG.platform.height
     }));
 
   for (const it of section.items) {
@@ -978,7 +1047,7 @@ function spawnSection(section) {
         yTop = Math.max(0, best.yTop - margin - h);
       } else {
         const h = it.h ?? 50;
-        const targetBottom = Math.max(120, viewport.groundY - 220);
+        const targetBottom = Math.max(120, world.groundY - 220);
         yTop = Math.max(0, targetBottom - h);
       }
       const obj = spawnTopSpikeAt(x, it.w ?? 32, it.h ?? 50, yTop);
@@ -1019,29 +1088,59 @@ function spawnNext() {
   const newBlk = world.blocks.slice(beforeBlk);
   const newTop = (world.topSpikes || []).slice(beforeTop);
   const newSaws = world.saws.slice(beforeSaws);
-  let firstX = Infinity;
-  let lastX = -Infinity;
-  for (const o of newObs) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
-  for (const o of newPlat) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
-  for (const o of newBlk) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
-  for (const o of newTop) { firstX = Math.min(firstX, o.x); lastX = Math.max(lastX, o.x + (o.width || 0)); }
-  for (const s of newSaws) { const w = (s.r || 0) * 2; firstX = Math.min(firstX, s.x - w/2); lastX = Math.max(lastX, s.x + w/2); }
-  // record section boundaries in world space
-  const startWX = isFinite(firstX) ? firstX : base;
-  const endWX = isFinite(lastX) ? lastX : (base + sec.length);
+  let hazardFirstLeft = Infinity;
+  let hazardLastRight = -Infinity;
+  // Only hazards define the section (exclude platforms/coins/bonuses)
+  // Convert to world-space (store +world.distance) so that debug draw as (worldX - world.distance) aligns over time
+  for (const o of newObs) {
+    const leftW = o.x + world.distance;
+    const rightW = o.x + (o.width || 0) + world.distance;
+    hazardFirstLeft = Math.min(hazardFirstLeft, leftW);
+    hazardLastRight = Math.max(hazardLastRight, rightW);
+  }
+  for (const o of newBlk) {
+    const leftW = o.x + world.distance;
+    const rightW = o.x + (o.width || 0) + world.distance;
+    hazardFirstLeft = Math.min(hazardFirstLeft, leftW);
+    hazardLastRight = Math.max(hazardLastRight, rightW);
+  }
+  for (const o of newTop) {
+    const leftW = o.x + world.distance;
+    const rightW = o.x + (o.width || 0) + world.distance;
+    hazardFirstLeft = Math.min(hazardFirstLeft, leftW);
+    hazardLastRight = Math.max(hazardLastRight, rightW);
+  }
+  for (const s of newSaws) {
+    const r = (s.r || 0);
+    const leftW = (s.x - r) + world.distance;
+    const rightW = (s.x + r) + world.distance;
+    hazardFirstLeft = Math.min(hazardFirstLeft, leftW);
+    hazardLastRight = Math.max(hazardLastRight, rightW);
+  }
+  // if no hazards spawned in this section, skip section boundary registration
+  if (!isFinite(hazardFirstLeft) || !isFinite(hazardLastRight)) {
+    world.nextSectionIndex += 1;
+    return;
+  }
+  // record section boundaries in WORLD SPACE based on actual spawned hazards
+  const startWX = hazardFirstLeft;
+  const endWX = hazardLastRight;
   world.sections.push({ index, startWX, endWX });
   dbg('SECTION', index, { startWX, endWX, base, length: sec.length });
   world.nextSectionIndex += 1;
   if (DEBUG) {
     world.currentSectionIdx = index;
-    // set pending gap between previous section end and current section start (real positions)
+    // enqueue all upcoming quiet gaps; confirmation is handled centrally in update()
     const prevSection = world.sections[world.sections.length - 2];
-    if (prevSection && isFinite(firstX)) {
-      const gapMid = (prevSection.endWX + startWX) / 2;
-      const playerWorldX = world.distance + world.player.x;
-      if (world.pendingGapMidWX == null && gapMid > playerWorldX + 20) {
-        world.pendingGapMidWX = gapMid;
-        dbg('PENDING_GAP', { prevEnd: prevSection.endWX, nextStart: startWX, gapMid });
+    if (prevSection) {
+      const quietWidth = startWX - prevSection.endWX;
+      if (quietWidth > 40) {
+        const gapMid = prevSection.endWX + quietWidth / 2;
+        const playerWorldX = world.distance + world.player.x;
+        if (gapMid > playerWorldX + 20) {
+          (world.gapQueue ||= []).push(gapMid);
+          dbg('QUEUE_GAP', { gapMid, quietWidth });
+        }
       }
     }
   }
@@ -1106,7 +1205,7 @@ function update(dt) {
   }
 
   // ground collision
-  const groundTop = viewport.groundY - player.height;
+  const groundTop = world.groundY - player.height;
   if (player.y >= groundTop) {
     player.y = groundTop;
     player.vy = 0;
@@ -1122,9 +1221,19 @@ function update(dt) {
   }
 
   // If we have a pending gap midpoint (world-space) and player prošel za něj, potvrď gap snapshot
-  if (DEBUG && typeof world.pendingGapMidWX === 'number') {
+  if (DEBUG) {
     const playerWorldX = world.distance + world.player.x;
-    if (playerWorldX > world.pendingGapMidWX) {
+    // initialize from queue if none pending
+    if (world.pendingGapMidWX == null && Array.isArray(world.gapQueue) && world.gapQueue.length) {
+      if (world.gapQueue[0] > playerWorldX + 20) {
+        world.pendingGapMidWX = world.gapQueue.shift();
+      } else {
+        // drop outdated entries
+        while (world.gapQueue.length && world.gapQueue[0] <= playerWorldX + 20) world.gapQueue.shift();
+        if (world.gapQueue.length) world.pendingGapMidWX = world.gapQueue.shift();
+      }
+    }
+    if (typeof world.pendingGapMidWX === 'number' && playerWorldX > world.pendingGapMidWX) {
       const gapSnap = captureSnapshot();
       // align on restore do středu gapu: distanceOverride = gapMid - player.x
       gapSnap.distanceOverride = Math.max(0, world.pendingGapMidWX - world.player.x);
@@ -1410,32 +1519,34 @@ function drawDebugSections(ctx) {
   ctx.lineWidth = 2;
   ctx.font = '10px system-ui, sans-serif';
   ctx.textAlign = 'left';
-  // Draw section boundaries
-  for (const s of world.sections) {
-    if (!s) continue;
-    // start line (green)
-    if (s.startX >= leftWorld && s.startX <= rightWorld) {
-      const x = Math.floor(s.startX - world.distance);
-      ctx.strokeStyle = '#22c55e';
-      ctx.setLineDash([8, 6]);
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, viewport.groundY);
-      ctx.stroke();
-      ctx.fillStyle = '#22c55e';
-      ctx.fillText(`S${s.index}`, x + 4, 12);
-    }
-    // end line (red)
-    if (s.endX >= leftWorld && s.endX <= rightWorld) {
-      const x = Math.floor(s.endX - world.distance);
-      ctx.strokeStyle = '#ef4444';
-      ctx.setLineDash([8, 6]);
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, viewport.groundY);
-      ctx.stroke();
-      ctx.fillStyle = '#ef4444';
-      ctx.fillText(`E${s.index}`, x + 4, 24);
+  // Draw section boundaries (toggleable)
+  if (SHOW_SECTION_BOUNDS && Array.isArray(world.sections)) {
+    for (const s of world.sections) {
+      if (!s) continue;
+      // start line (green)
+      if (s.startWX >= leftWorld && s.startWX <= rightWorld) {
+        const x = Math.floor(s.startWX - world.distance);
+        ctx.strokeStyle = '#22c55e';
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, world.groundY);
+        ctx.stroke();
+        ctx.fillStyle = '#22c55e';
+        ctx.fillText(`S${s.index}`, x + 4, 12);
+      }
+      // end line (red)
+      if (s.endWX >= leftWorld && s.endWX <= rightWorld) {
+        const x = Math.floor(s.endWX - world.distance);
+        ctx.strokeStyle = '#ef4444';
+        ctx.setLineDash([8, 6]);
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, world.groundY);
+        ctx.stroke();
+        ctx.fillStyle = '#ef4444';
+        ctx.fillText(`E${s.index}`, x + 4, 24);
+      }
     }
   }
   // Draw gap midpoints
@@ -1446,7 +1557,7 @@ function drawDebugSections(ctx) {
       ctx.setLineDash([4, 4]);
       ctx.beginPath();
       ctx.moveTo(Math.floor(gx), 0);
-      ctx.lineTo(Math.floor(gx), viewport.groundY);
+      ctx.lineTo(Math.floor(gx), world.groundY);
       ctx.stroke();
       ctx.fillStyle = '#22d3ee';
       ctx.fillText('GAP', Math.floor(gx) + 4, 36);
@@ -1459,7 +1570,7 @@ function drawDebugSections(ctx) {
       ctx.setLineDash([2, 6]);
       ctx.beginPath();
       ctx.moveTo(Math.floor(gx), 0);
-      ctx.lineTo(Math.floor(gx), viewport.groundY);
+      ctx.lineTo(Math.floor(gx), world.groundY);
       ctx.stroke();
       ctx.fillStyle = '#f59e0b';
       ctx.fillText('PENDING', Math.floor(gx) + 4, 48);
@@ -1704,18 +1815,14 @@ function draw(timestamp) {
       state._accum -= FIXED_DT;
       // If playing a replay, inject down/up events precisely aligned to world.time
     if (state.replay && state.replay.actions) {
+      // Pure tick-based scheduling for determinismus; ignore time-based 't' during playback
       const currentTick = world.tick || 0;
       while (true) {
         const idx = state.replayPtr || 0;
         const next = state.replay.actions[idx];
         if (!next) break;
-        const targetTick = (typeof next.k === 'number') ? next.k : null;
-        if (targetTick != null) {
-          if (currentTick < targetTick) break;
-        } else {
-          const tRel = world.time - (state.replayStartTime || 0);
-          if (tRel < (next.t || 0)) break;
-        }
+        const targetTick = (typeof next.k === 'number') ? next.k : Math.round((next.t || 0) / FIXED_DT);
+        if (currentTick < targetTick) break;
         if (next.action === 'down') state._injectDown = true;
         else if (next.action === 'up') state._injectUp = true;
         state.replayPtr = idx + 1;
@@ -1817,9 +1924,10 @@ dom.showHint?.addEventListener('click', () => {
   const demo = getEmbeddedDemo(lvl);
   if (!demo) return;
   startLevel(lvl);
-  state.replay = demo;
+  // Strict tick-based replay start from tick 0
+  state.replay = { meta: demo.meta, actions: (demo.actions || []).slice().sort((a,b)=> (a.k??Math.round((a.t||0)/FIXED_DT)) - (b.k??Math.round((b.t||0)/FIXED_DT))) };
   state.replayPtr = 0;
-  state.replayStartTime = world.time;
+  state.replayStartTime = 0;
   state.running = true;
   dom.gameover.classList.remove('visible');
   dom.stopReplay?.classList.remove('hidden');
@@ -1845,20 +1953,31 @@ dom.menuBtn?.addEventListener('click', () => {
 dom.nextLevel?.addEventListener('click', () => {
   dom.leveldone.classList.remove('visible');
   // go to next level if exists
-  const next = Math.min((state.level || 1) + 1, LEVELS.length);
-  state.level = next;
-  startLevel(state.level);
-  state.running = true;
-  document.getElementById('app')?.classList.add('playing');
+  const current = state.level || 1;
+  // In non-debug, advance only to next level that has embedded demo
+  let next = Math.min(current + 1, LEVELS.length);
+  if (!DEBUG) {
+    while (next <= LEVELS.length && !hasEmbeddedDemo(next)) next++;
+  }
+  if (next <= LEVELS.length) {
+    state.level = next;
+    startLevel(state.level);
+    state.running = true;
+    document.getElementById('app')?.classList.add('playing');
+  } else {
+    // No further level available; return to menu
+    dom.menu.classList.add('visible');
+    document.getElementById('app')?.classList.remove('playing');
+  }
 });
 
 // Copy replay JSON (debug)
 dom.copyReplay?.addEventListener('click', async () => {
   try {
-    const key = `sekina_replay_L${state.level || 1}`;
-    const val = localStorage.getItem(key) || '';
-    if (!val) return;
-    await navigator.clipboard.writeText(val);
+    const meta = { seed: world.seedStr, level: state.level, when: Date.now() };
+    const actions = Array.isArray(state.autoRecording) ? state.autoRecording : [];
+    const json = JSON.stringify({ meta, actions });
+    await navigator.clipboard.writeText(json);
     state.uiToasts.push({ id: Math.random(), text: 'Copied!', born: world.time, dur: 0.8 });
   } catch {}
 });
